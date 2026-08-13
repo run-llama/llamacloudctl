@@ -128,10 +128,9 @@ changelog:
       - "Merge branch"
 
 release:
-  # Public distribution repo. The source lives in the private run-llama/llamacloudctl;
-  # customer-facing binaries + install.sh are published here so anyone can install.
-  # Cross-repo publishing needs GITHUB_TOKEN to be a token with write access to this
-  # repo (see .github/workflows/release.yml — RELEASE_TOKEN secret).
+  # Publishes customer-facing binaries + install.sh to this repo's GitHub Releases
+  # so anyone can install. Cut by the release job in ci.yml on a pushed v* tag,
+  # with the default GITHUB_TOKEN (contents: write).
   github:
     owner: run-llama
     name: llamacloudctl

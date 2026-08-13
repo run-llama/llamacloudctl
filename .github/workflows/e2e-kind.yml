@@ -9,8 +9,7 @@
 # are exercised against a REAL Kubernetes API server without ever touching a
 # cloud account or a customer cluster.
 #
-# release-cut.yml gates a release on this workflow having concluded successfully
-# on the target commit.
+# It runs on every PR and push to main as the install/upgrade confidence gate.
 name: e2e-kind
 
 on:

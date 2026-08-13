@@ -1,11 +1,16 @@
-# Continuous integration: runs on every push to main and every PR.
-# Gates merges on formatting, vet, tests, and a full cross-platform build so a
-# release tag never fails on something CI could have caught.
+# Continuous integration + release.
+#
+# On a push to main or a PR: gofmt, vet, tests, lint, and a full cross-platform
+# build so a release never fails on something CI could have caught.
+# On a pushed SemVer tag (v*): GoReleaser cuts the GitHub Release.
+#   git tag v1.2.0 && git push origin v1.2.0
 name: ci
 
 on:
   push:
     branches: [main]
+    tags:
+      - "v*"
   pull_request:
     branches: [main]
 
@@ -14,6 +19,7 @@ permissions:
 
 jobs:
   test:
+    if: github.ref_type == 'branch'
     runs-on: ubuntu-latest
     env:
       # The troubleshoot dependency's build-tag contract (see Makefile TAGS):
@@ -43,8 +49,9 @@ jobs:
         run: go test ./...
 
   # Static analysis beyond `go vet`: errcheck, staticcheck, ineffassign, unused,
-  # misspell, unconvert (see .golangci.yml). Runs on every PR + push to main.
+  # misspell, unconvert (see .golangci.yml).
   lint:
+    if: github.ref_type == 'branch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -63,8 +70,10 @@ jobs:
           version: latest
 
   # Proves every release target still cross-compiles, and that .goreleaser.yaml
-  # is valid — without publishing anything.
+  # is valid — without publishing. The real release build runs in the release job
+  # on a tag, so this branch/PR smoke is skipped there.
   build-matrix:
+    if: github.ref_type == 'branch'
     runs-on: ubuntu-latest
     steps:
       - name: Free runner disk space
@@ -90,3 +99,41 @@ jobs:
           distribution: goreleaser
           version: "~> v2"
           args: release --snapshot --clean --skip=sign,publish
+
+  # A pushed SemVer tag (v*) cuts the GitHub Release: GoReleaser cross-compiles
+  # every target, packages archives + deb/rpm/apk, writes checksums,
+  # cosign-keyless-signs them, and publishes the Release. No approval gate — the
+  # act of pushing the tag is the decision.
+  release:
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub Release + upload assets
+      id-token: write # cosign keyless signing via GitHub OIDC
+    steps:
+      - name: Free runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /opt/hostedtoolcache/CodeQL /usr/local/.ghcup /usr/share/swift
+          df -h /
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history + tags for the changelog
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
