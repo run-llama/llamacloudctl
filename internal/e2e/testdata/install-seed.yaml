@@ -1,0 +1,37 @@
+# Non-interactive install input for the kind end-to-end suite.
+#
+# It is the smallest seed that clears the mode-independent guards
+# (internal/install/assemble.go) and the install's values preflight:
+#   license.key                       — a license must be configured
+#   config.llms.openAi                — an embeddings-capable LLM provider
+#   config.authentication.basicAuth   — config.authentication must be present
+#   config.storageBuckets.provider    — aws needs no s3proxy shim
+#
+# There are deliberately NO postgresql/redis/temporal blocks: the suite runs with
+# ProvisionInCluster, so the CLI itself wires those endpoints and credentials.
+# That is the wiring the probe chart's readiness probes then verify for real.
+#
+# Every value here is a throwaway placeholder. Nothing in this file is a
+# credential, and the suite makes no call that would use one: the license is not
+# signature-checked at install time, the OpenAI key is never dialled, and the
+# harness scrubs the cloud credential environment before any test runs.
+#
+# The same seed is used for the published-chart dry-run, so it must stay valid
+# against the real chart's values.schema.json — the dry-run test is what catches
+# it if a chart bump breaks that.
+license:
+  key: e2e-not-a-real-license
+
+config:
+  llms:
+    openAi:
+      apiKey: e2e-not-a-real-openai-key
+  authentication:
+    basicAuth:
+      enabled: true
+      validEmailDomain: example.invalid
+      jwtSecret: e2e-not-a-real-jwt-secret
+  parseOcr:
+    gpu: false
+  storageBuckets:
+    provider: aws

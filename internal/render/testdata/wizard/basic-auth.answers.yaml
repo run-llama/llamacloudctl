@@ -1,0 +1,39 @@
+# Scripted answers for a full guided-wizard run with BASIC auth, keyed by prompt
+# title. Consumed by the wizard-driven render profile: the harness feeds these to
+# the NonInteractive prompter, runs the REAL RunWizard, and renders its output
+# against the pinned chart — so any wizard->chart value-mapping bug surfaces here.
+"License source": "paste JWT"
+"License JWT": "not-a-real-jwt-but-non-empty"
+
+"Authentication mode": "basic"
+"Basic auth valid email domain": "example.com"
+"Basic auth JWT secret": "fixture-jwt-secret"
+
+"LLM providers (select at least one embeddings-capable provider)": ["openai"]
+"openai API key": "sk-openai-fixture"
+
+"Customize data services and object storage? (default: install databases in-cluster + use an existing S3 bucket you name)": true
+
+"Object storage provider": "aws"
+"AWS object storage: create buckets for me, or use existing?": "use existing buckets"
+"Existing bucket name (applied to all bucket purposes)": "llama-fixture-bucket"
+"Object storage credentials": "IRSA (IAM role for service account)"
+"IAM role ARN for S3 access (eks.amazonaws.com/role-arn; empty = use the node/instance role)": ""
+
+"postgres: how should it be provided?": "existing endpoint"
+"postgres host": "pg.internal"
+"postgres port": "5432"
+"postgres username": "llama"
+"postgres password": "pgpass"
+"postgres database": "llamacloud"
+
+"redis: how should it be provided?": "existing endpoint"
+"redis host": "redis.internal"
+"redis port": "6379"
+"redis username": ""
+"redis password": "redispass"
+"redis db number": "0"
+
+"Temporal: how should it be provided?": "external endpoint"
+"temporal host": "temporal.internal"
+"temporal port": "7233"

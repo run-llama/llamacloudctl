@@ -1,0 +1,20 @@
+# seed-no-endpoints: a scripted seed that carries everything the guards require
+# EXCEPT data-service endpoints, so --provision-in-cluster has something to do.
+#
+# It is the counterpart of seed-good.yaml (which supplies external postgres/redis
+# endpoints). Since --provision-in-cluster is SCOPED to services with no supplied
+# endpoint, a seed that names endpoints exercises the "keep what you supplied"
+# half of that rule, and this one exercises the "stand it up in-cluster" half.
+license:
+  key: not-a-real-jwt-but-non-empty
+config:
+  llms:
+    # openAi, not openai: the published chart schema sets additionalProperties
+    # false on config.llms and only accepts the camelCase provider keys.
+    openAi:
+      apiKey: sk-openai-xxx
+  authentication:
+    oidc:
+      discoveryUrl: https://id.example.com/.well-known/openid-configuration
+  storageBuckets:
+    provider: aws

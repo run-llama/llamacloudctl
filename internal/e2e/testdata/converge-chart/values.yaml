@@ -1,0 +1,25 @@
+# Defaults for the kind end-to-end probe chart.
+#
+# postgresql.* and redis.* are the SAME keys the real LlamaCloud chart consumes.
+# They are left empty here on purpose: the install flow fills them in (from the
+# --provision-in-cluster recipe, or from the -f seed), and the probe templates
+# read them back. An empty host renders an unresolvable probe, which is exactly
+# the failure an operator would get, so nothing is silently defaulted.
+postgresql:
+  host: ""
+  port: "5432"
+  database: llamacloud
+  username: llamacloud
+
+redis:
+  host: ""
+  port: "6379"
+  password: ""
+
+# Harness-only knobs. e2e.postgresImage is overridden to a nonexistent tag by the
+# rollout-failure test, which is how that test drives the install's timeout and
+# diagnostic path with a workload that provably cannot converge.
+e2e:
+  postgresImage: postgres:17-alpine
+  redisImage: redis:8-alpine
+  redisProbe: true

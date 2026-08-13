@@ -1,0 +1,5 @@
+# aws-existing overlay: AWS object storage (no s3proxy shim) on top of the
+# base existing-endpoint substrate. Represents the demoable core install path.
+config:
+  storageBuckets:
+    provider: aws

@@ -1,0 +1,1837 @@
+---
+# Source: llamacloud/templates/llamacloud/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "llamacloud"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud"
+  annotations:
+---
+# Source: llamacloud/templates/llamacloud/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "llamacloud-web"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-web"
+  annotations:
+---
+# Source: llamacloud/templates/llamacloud/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "llamacloud-operator"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-operator"
+  annotations:
+---
+# Source: llamacloud/templates/llamacloud/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "llamacloud-parse"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-parse"
+  annotations:
+---
+# Source: llamacloud/templates/llamacloud/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "llamacloud-layout"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-layout"
+  annotations:
+---
+# Source: llamacloud/templates/llamacloud/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "llamacloud-ocr"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-ocr"
+  annotations:
+---
+# Source: llamacloud/templates/llamacloud/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "temporal-jobs-worker"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "temporal-jobs-worker"
+  annotations:
+---
+# Source: llamacloud/templates/llamacloud/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "llamacloud-temporal-parse"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-temporal-parse"
+  annotations:
+---
+# Source: llamacloud/templates/llamacloud/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "llamacloud-telemetry"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-telemetry"
+  annotations:
+---
+# Source: llamacloud/templates/llamacloud/secrets/auth.oidc.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: oidc-secret
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  OIDC_DISCOVERY_URL: "aHR0cHM6Ly9pZC5leGFtcGxlLmNvbS8ud2VsbC1rbm93bi9vcGVuaWQtY29uZmlndXJhdGlvbg=="
+  OIDC_CLIENT_ID: "bGxhbWFjbG91ZC1jbGllbnQ="
+  OIDC_CLIENT_SECRET: "b2lkYy1jbGllbnQtc2VjcmV0LWZpeHR1cmU="
+  SESSION_SECRET_KEY: "<normalized-nondeterministic>"
+---
+# Source: llamacloud/templates/llamacloud/secrets/buckets-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bucket-secret
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+---
+# Source: llamacloud/templates/llamacloud/secrets/data.postgresql.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgresql-secret
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  DATABASE_HOST: "cGcuaW50ZXJuYWw="
+  DATABASE_PORT: "NTQzMg=="
+  DATABASE_NAME: "bGxhbWFjbG91ZA=="
+  DATABASE_USER: "bGxhbWE="
+  DATABASE_PASSWORD: "cGdwYXNz"
+---
+# Source: llamacloud/templates/llamacloud/secrets/data.redis.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-secret
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  REDIS_SCHEME: "cmVkaXM="
+  REDIS_PORT: "NjM3OQ=="
+  REDIS_DB: "MA=="
+  REDIS_HOST: "cmVkaXMuaW50ZXJuYWw="
+  REDIS_USERNAME: ""
+  REDIS_PASSWORD: "cmVkaXNwYXNz"
+---
+# Source: llamacloud/templates/llamacloud/secrets/license.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: llamacloud-license-key
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  LLAMACLOUD_LICENSE_KEY: "bm90LWEtcmVhbC1qd3QtYnV0LW5vbi1lbXB0eQ=="
+---
+# Source: llamacloud/templates/llamacloud/secrets/llm.openai.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openai-api-key-secret
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  OPENAI_API_KEY: "c2stb3BlbmFpLWZpeHR1cmU="
+  LC_OPENAI_API_KEY: "c2stb3BlbmFpLWZpeHR1cmU="
+  EVAL_OPENAI_API_KEY: "c2stb3BlbmFpLWZpeHR1cmU="
+---
+# Source: llamacloud/templates/llamacloud/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "llamacloud-web"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-web"
+  annotations:     
+data:   
+  HOSTNAME: 0.0.0.0
+  IS_INDEX_V1_ENABLED: "true"
+---
+# Source: llamacloud/templates/llamacloud/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "llamacloud-parse"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-parse"
+  annotations:     
+data:   
+  DEBUG_MODE: "false"
+  MAX_QUEUE_CONCURRENCY: "3"
+---
+# Source: llamacloud/templates/llamacloud/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "temporal-jobs-worker"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "temporal-jobs-worker"
+  annotations:     
+data:   
+  JOB_CONSUMER_PORT: "80"
+  
+  MAX_JOBS_IN_EXECUTION_PER_JOB_TYPE: "10"
+  MAX_INDEX_JOBS_IN_EXECUTION: "0"
+  MAX_DOCUMENT_INGESTION_JOBS_IN_EXECUTION: "1"
+  INCLUDE_JOB_ERROR_DETAILS: "true"
+  DEFAULT_TRANSFORM_DOCUMENT_TIMEOUT_SECONDS: "240"
+  TRANSFORM_EMBEDDING_CHAR_LIMIT: "11520000"
+  CLEANUP_PARSE_V2_RETENTION_DAYS: "30"
+  CLEANUP_PARSE_V2_BATCH_SIZE: "100"
+  CLEANUP_EXTRACT_V2_RETENTION_DAYS: "14"
+  CLEANUP_EXTRACT_V2_BATCH_SIZE: "100"
+  CLEANUP_CLASSIFY_V2_RETENTION_DAYS: "14"
+  CLEANUP_CLASSIFY_V2_BATCH_SIZE: "100"
+---
+# Source: llamacloud/templates/llamacloud/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "llamacloud-temporal-parse"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-temporal-parse"
+  annotations:     
+data:   
+  DEBUG_MODE: "false"
+  MAX_QUEUE_CONCURRENCY: "3"
+---
+# Source: llamacloud/templates/llamacloud/configmaps/buckets.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bucket-config
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  CLOUD_PROVIDER: "aws"
+
+  S3_DOCUMENT_BUCKET_NAME: llama-fixture-bucket
+  S3_ETL_BUCKET_NAME: llama-fixture-bucket
+  S3_EXTERNAL_COMPONENTS_BUCKET_NAME: llama-fixture-bucket
+  S3_FILE_PARSING_BUCKET_NAME: llama-fixture-bucket
+  S3_RAW_FILE_BUCKET_NAME: llama-fixture-bucket
+  S3_LLAMA_CLOUD_PARSE_OUTPUT_BUCKET_NAME: llama-fixture-bucket
+  S3_FILE_SCREENSHOT_BUCKET_NAME: llama-fixture-bucket
+  S3_LLAMA_EXTRACT_OUTPUT_BUCKET_NAME: llama-fixture-bucket
+
+  S3_UPLOAD_BUCKET: llama-fixture-bucket
+  S3_OUTPUT_BUCKET: llama-fixture-bucket
+---
+# Source: llamacloud/templates/llamacloud/configmaps/common.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: common-config
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  IS_DEPLOYED: "true"
+  DEPLOYMENT_MODE: "prod"
+  PARSE_PREMIUM: "true"
+  ALLOWED_INDEX: "true"
+  MONGO_DISABLED: "true"
+  AMQP_DISABLED: "true"
+---
+# Source: llamacloud/templates/llamacloud/configmaps/concurrency.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: concurrency-config
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+---
+# Source: llamacloud/templates/llamacloud/configmaps/extract.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: extract-config
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  LLAMA_EXTRACT_SCHEMA_GENERATION_MODEL: "openai-gpt-4-1-mini"
+  LLAMA_EXTRACT_MAX_PAGES: "500"
+  LLAMA_EXTRACT_MAX_FILE_SIZE_MB: "100"
+---
+# Source: llamacloud/templates/llamacloud/configmaps/features.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: feature-config
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  ## Read by frontend (server-only, non-NEXT_PUBLIC) and backend FeatureFlagSettings
+  IS_AGENT_DEPLOYMENTS_ENABLED: "false"
+---
+# Source: llamacloud/templates/llamacloud/configmaps/rate-limits.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rate-limits-config
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  PARSE_RATE_LIMIT_DEFAULT_QUERIES: "500"
+  PARSE_RATE_LIMIT_DEFAULT_SECONDS: "10"
+  DEFAULT_PARSE_API_QUERY_QPS: "80"
+  DEFAULT_PARSE_API_LIST_QPS: "5"
+  DEFAULT_EXTRACT_API_CREATION_QPS: "40"
+  DEFAULT_EXTRACT_API_QUERY_QPS: "80"
+  DEFAULT_EXTRACT_API_LIST_QPS: "5"
+  DEFAULT_EXTRACT_AGENT_CREATION_QPS: "10"
+  DEFAULT_CLASSIFY_API_CREATION_QPS: "40"
+  DEFAULT_CLASSIFY_API_QUERY_QPS: "80"
+  DEFAULT_CLASSIFY_API_LIST_QPS: "5"
+  DEFAULT_SPLIT_CREATION_QPS: "40"
+  DEFAULT_SPLIT_QUERY_QPS: "80"
+  DEFAULT_SPREADSHEET_CREATION_QPM: "60"
+  DEFAULT_SPREADSHEET_API_QUERY_QPS: "80"
+  DEFAULT_SPREADSHEET_API_LIST_QPS: "5"
+  DEFAULT_USAGE_API_QUERY_QPS: "20"
+---
+# Source: llamacloud/templates/llamacloud/configmaps/temporal.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-connection-config
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  TEMPORAL_HOST: "temporal.internal"
+  TEMPORAL_PORT: "7233"
+  TEMPORAL_NAMESPACE: "llamacloud"
+  TEMPORAL_WORKER_REGISTRY_PROFILE: "consolidated"
+  TEMPORAL_EXTERNAL_PAYLOAD_STORAGE_ENABLED: "false"
+---
+# Source: llamacloud/templates/llamacloud/configmaps/urls.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: urls-config
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+data:
+  JOB_API_SERVICE_PORT: "80"
+  JOB_SERVICE_URL: "http://llamacloud-operator:80"
+  TRACKING_SERVICE_URL: "http://llamacloud-telemetry:80"
+  # BACKEND_URL is the in-cluster backend Service URL. It is consumed only by
+  # server-side code (SSR outbound fetches and the /api /deployments proxy
+  # route handlers). Browser-destined URLs read PUBLIC_BACKEND_URL instead.
+  BACKEND_URL: "http://llamacloud:80"
+  AGENT_DEPLOYMENT_USE_PUBLIC_BACKEND_URL: "false"
+  OCR_SERVER_URL: "http://llamacloud-ocr:80/ocr"
+  LAYOUT_EXTRACTION_ENDPOINT: "http://llamacloud-layout:80"
+  LAYOUT_EXTRACTION_V2_ENDPOINT: "http://llamacloud-layout:80"
+---
+# Source: llamacloud/templates/llamacloud/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "llamacloud"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud"
+  annotations:     
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  selector:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud"
+---
+# Source: llamacloud/templates/llamacloud/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "llamacloud-web"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-web"
+  annotations:     
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+    protocol: TCP
+  selector:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-web"
+---
+# Source: llamacloud/templates/llamacloud/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "llamacloud-operator"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-operator"
+  annotations:     
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8002
+    protocol: TCP
+  selector:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-operator"
+---
+# Source: llamacloud/templates/llamacloud/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "llamacloud-parse"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-parse"
+  annotations:     
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8004
+    protocol: TCP
+  selector:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-parse"
+---
+# Source: llamacloud/templates/llamacloud/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "llamacloud-layout"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-layout"
+  annotations:     
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  selector:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-layout"
+---
+# Source: llamacloud/templates/llamacloud/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "llamacloud-ocr"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-ocr"
+  annotations:     
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-ocr"
+---
+# Source: llamacloud/templates/llamacloud/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "temporal-jobs-worker"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "temporal-jobs-worker"
+  annotations:     
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  selector:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "temporal-jobs-worker"
+---
+# Source: llamacloud/templates/llamacloud/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "llamacloud-temporal-parse"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-temporal-parse"
+  annotations:     
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8003
+    protocol: TCP
+  selector:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-temporal-parse"
+---
+# Source: llamacloud/templates/llamacloud/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "llamacloud-telemetry"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-telemetry"
+  annotations:     
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8005
+    protocol: TCP
+  selector:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-telemetry"
+---
+# Source: llamacloud/templates/llamacloud/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "llamacloud"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud"
+  annotations:     
+spec:
+  replicas: 
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:       
+      app.kubernetes.io/instance: llamacloud
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: "llamacloud"
+  template:
+    metadata:
+      labels:         
+        app.kubernetes.io/instance: llamacloud
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: "llamacloud"
+      annotations:         
+    spec:
+      imagePullSecrets: 
+        []
+      serviceAccountName: "llamacloud"
+      securityContext:         
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: "llamacloud"
+        securityContext:           
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        image: "docker.io/llamaindex/llamacloud-backend:0.8.5"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        command: 
+          - start_platform_api
+        livenessProbe:           
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        readinessProbe:           
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        startupProbe:           
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 30
+        resources:           
+          requests:
+            cpu: 500m
+            memory: 4Gi
+          limits:
+            cpu: 2
+            memory: 6Gi
+        env:         
+        - name: LOG_LEVEL
+          value: INFO
+        - name: PORT
+          value: "8000"
+        - name: UVICORN_PORT
+          value: "8000"
+        envFrom:         
+        - secretRef:
+            name: llamacloud-license-key
+        - configMapRef:
+            name: bucket-config
+        - configMapRef:
+            name: common-config
+        - configMapRef:
+            name: extract-config
+        - configMapRef:
+            name: rate-limits-config
+        - configMapRef:
+            name: urls-config
+        - configMapRef:
+            name: temporal-connection-config
+        - configMapRef:
+            name: feature-config
+        - secretRef:
+            name: bucket-secret
+        - secretRef:
+            name: "postgresql-secret"
+        - secretRef:
+            name: "redis-secret"
+        - secretRef:
+            name: "oidc-secret"
+        - secretRef:
+            name: "openai-api-key-secret"
+        volumeMounts:        
+        - mountPath: /tmp
+          name: tmp      
+      volumes:       
+      - emptyDir: {}
+        name: tmp
+      terminationGracePeriodSeconds: 30
+---
+# Source: llamacloud/templates/llamacloud/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "llamacloud-web"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-web"
+  annotations:     
+spec:
+  replicas: 
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:       
+      app.kubernetes.io/instance: llamacloud
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: "llamacloud-web"
+  template:
+    metadata:
+      labels:         
+        app.kubernetes.io/instance: llamacloud
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: "llamacloud-web"
+      annotations:         
+    spec:
+      imagePullSecrets: 
+        []
+      serviceAccountName: "llamacloud-web"
+      securityContext:         
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: "llamacloud-web"
+        securityContext:           
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        image: "docker.io/llamaindex/llamacloud-frontend:0.8.5"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        livenessProbe:           
+          httpGet:
+            path: /api/healthz
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        readinessProbe:           
+          httpGet:
+            path: /api/healthz
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        startupProbe:           
+          httpGet:
+            path: /api/healthz
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 30
+        resources:           
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 1
+            memory: 1Gi
+        env:         
+        - name: LOG_LEVEL
+          value: INFO
+        - name: PORT
+          value: "3000"
+        - name: UVICORN_PORT
+          value: "3000"
+        envFrom:         
+        - secretRef:
+            name: llamacloud-license-key
+        - configMapRef:
+            name: urls-config
+        - configMapRef:
+            name: feature-config
+        - configMapRef:
+            name: llamacloud-web
+        volumeMounts:        
+        - mountPath: /tmp
+          name: tmp
+        - mountPath: /.next/cache
+          name: nextjs-cache
+        - mountPath: /app/frontend/.next/cache
+          name: local-nextjs-cache
+      volumes:       
+      - emptyDir: {}
+        name: tmp
+      - emptyDir: {}
+        name: nextjs-cache
+      - emptyDir: {}
+        name: local-nextjs-cache
+      terminationGracePeriodSeconds: 30
+---
+# Source: llamacloud/templates/llamacloud/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "llamacloud-operator"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-operator"
+  annotations:     
+spec:
+  replicas: 
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:       
+      app.kubernetes.io/instance: llamacloud
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: "llamacloud-operator"
+  template:
+    metadata:
+      labels:         
+        app.kubernetes.io/instance: llamacloud
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: "llamacloud-operator"
+      annotations:         
+    spec:
+      imagePullSecrets: 
+        []
+      serviceAccountName: "llamacloud-operator"
+      securityContext:         
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: "llamacloud-operator"
+        securityContext:           
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        image: "docker.io/llamaindex/llamacloud-backend:0.8.5"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8002
+          protocol: TCP
+        command: 
+          - start_job_service
+        livenessProbe:           
+          httpGet:
+            path: /api/health
+            port: http
+          periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 30
+        readinessProbe:           
+          httpGet:
+            path: /api/health
+            port: http
+          periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 30
+        startupProbe:           
+          httpGet:
+            path: /api/health
+            port: http 
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 30
+        resources:           
+          requests:
+            cpu: 500m
+            memory: 4Gi
+          limits:
+            cpu: 2
+            memory: 8Gi
+        env:         
+        - name: LOG_LEVEL
+          value: INFO
+        - name: PORT
+          value: "8002"
+        - name: UVICORN_PORT
+          value: "8002"
+        envFrom:         
+        - secretRef:
+            name: llamacloud-license-key
+        - configMapRef:
+            name: bucket-config
+        - configMapRef:
+            name: common-config
+        - configMapRef:
+            name: extract-config
+        - configMapRef:
+            name: urls-config
+        - secretRef:
+            name: bucket-secret
+        - secretRef:
+            name: "postgresql-secret"
+        - secretRef:
+            name: "redis-secret"
+        - secretRef:
+            name: "openai-api-key-secret"
+        volumeMounts:        
+        - mountPath: /tmp
+          name: tmp      
+      volumes:       
+      - emptyDir: {}
+        name: tmp
+      terminationGracePeriodSeconds: 30
+---
+# Source: llamacloud/templates/llamacloud/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "llamacloud-parse"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-parse"
+  annotations:     
+spec:
+  replicas: 0
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:       
+      app.kubernetes.io/instance: llamacloud
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: "llamacloud-parse"
+  template:
+    metadata:
+      labels:         
+        app.kubernetes.io/instance: llamacloud
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: "llamacloud-parse"
+      annotations:         
+    spec:
+      imagePullSecrets: 
+        []
+      serviceAccountName: "llamacloud-parse"
+      securityContext:         
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: "llamacloud-parse"
+        securityContext:           
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        image: "docker.io/llamaindex/llamacloud-llamaparse:0.8.5"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8004
+          protocol: TCP
+        livenessProbe:           
+          httpGet:
+            path: /livez
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 10
+        readinessProbe:           
+          httpGet:
+            path: /livez
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 10
+        startupProbe:           
+          httpGet:
+            path: /livez
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 10
+        resources:           
+          requests:
+            cpu: 3
+            memory: 6Gi
+          limits:
+            cpu: 7
+            memory: 13Gi
+        env:         
+        - name: LOG_LEVEL
+          value: INFO
+        - name: PORT
+          value: "8004"
+        - name: UVICORN_PORT
+          value: "8004"
+        envFrom:         
+        - secretRef:
+            name: llamacloud-license-key
+        - configMapRef:
+            name: bucket-config
+        - configMapRef:
+            name: urls-config
+        - configMapRef:
+            name: concurrency-config
+        - configMapRef:
+            name: llamacloud-parse
+        - secretRef:
+            name: bucket-secret
+        - secretRef:
+            name: "openai-api-key-secret"
+        volumeMounts:        
+        - mountPath: /tmp
+          name: tmp      
+      volumes:       
+      - emptyDir: {}
+        name: tmp
+      terminationGracePeriodSeconds: 30
+---
+# Source: llamacloud/templates/llamacloud/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "llamacloud-layout"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-layout"
+  annotations:     
+spec:
+  replicas: 
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:       
+      app.kubernetes.io/instance: llamacloud
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: "llamacloud-layout"
+  template:
+    metadata:
+      labels:         
+        app.kubernetes.io/instance: llamacloud
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: "llamacloud-layout"
+      annotations:         
+    spec:
+      imagePullSecrets: 
+        []
+      serviceAccountName: "llamacloud-layout"
+      securityContext:         
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: "llamacloud-layout"
+        securityContext:           
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        image: "docker.io/llamaindex/llamacloud-layout-detection-api:0.8.5"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        livenessProbe:           
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 5
+          failureThreshold: 5
+        readinessProbe:           
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 5
+          failureThreshold: 5
+        startupProbe:           
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 5
+          failureThreshold: 5
+        resources:           
+          requests:
+            cpu: 1
+            memory: 6Gi
+          limits:
+            cpu: 2
+            memory: 12Gi
+        env:         
+        - name: LOG_LEVEL
+          value: INFO
+        - name: PORT
+          value: "8000"
+        - name: UVICORN_PORT
+          value: "8000"
+        envFrom:         
+        - secretRef:
+            name: llamacloud-license-key
+        volumeMounts:        
+        - mountPath: /tmp
+          name: tmp
+      volumes:       
+      - emptyDir: {}
+        name: tmp
+      terminationGracePeriodSeconds: 30
+---
+# Source: llamacloud/templates/llamacloud/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "llamacloud-ocr"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-ocr"
+  annotations:     
+spec:
+  replicas: 
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:       
+      app.kubernetes.io/instance: llamacloud
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: "llamacloud-ocr"
+  template:
+    metadata:
+      labels:         
+        app.kubernetes.io/instance: llamacloud
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: "llamacloud-ocr"
+      annotations:         
+    spec:
+      imagePullSecrets: 
+        []
+      serviceAccountName: "llamacloud-ocr"
+      securityContext:         
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: "llamacloud-ocr"
+        securityContext:           
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        image: "docker.io/llamaindex/llamacloud-llamaparse-ocr:0.8.5-cpu"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        command: 
+          - serve
+        livenessProbe:           
+          httpGet:
+            path: /health_check
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 5
+          failureThreshold: 5
+        readinessProbe:           
+          httpGet:
+            path: /health_check
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 5
+          failureThreshold: 5
+        startupProbe:           
+          httpGet:
+            path: /health_check
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 5
+          failureThreshold: 5
+        resources:           
+          requests:
+            cpu: 2
+            memory: 12Gi
+          limits:
+            cpu: 4
+            memory: 16Gi
+        env:         
+        - name: LOG_LEVEL
+          value: INFO
+        - name: PORT
+          value: "8080"
+        - name: UVICORN_PORT
+          value: "8080"
+        envFrom:         
+        - secretRef:
+            name: llamacloud-license-key
+        volumeMounts:        
+        - mountPath: /tmp
+          name: tmp
+      volumes:       
+      - emptyDir: {}
+        name: tmp
+      terminationGracePeriodSeconds: 30
+---
+# Source: llamacloud/templates/llamacloud/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "temporal-jobs-worker"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "temporal-jobs-worker"
+  annotations:     
+spec:
+  replicas: 
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:       
+      app.kubernetes.io/instance: llamacloud
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: "temporal-jobs-worker"
+  template:
+    metadata:
+      labels:         
+        app.kubernetes.io/instance: llamacloud
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: "temporal-jobs-worker"
+      annotations:         
+    spec:
+      imagePullSecrets: 
+        []
+      serviceAccountName: "temporal-jobs-worker"
+      securityContext:         
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: "temporal-jobs-worker"
+        securityContext:           
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        image: "docker.io/llamaindex/llamacloud-backend:0.8.5"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        command: 
+          - temporal_worker
+        livenessProbe:           
+          httpGet:
+            path: /healthcheck
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 30
+        readinessProbe:           
+          httpGet:
+            path: /healthcheck
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 30
+        startupProbe:           
+          httpGet:
+            path: /healthcheck
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 30
+        resources:           
+          requests:
+            cpu: 500m
+            memory: 4Gi
+          limits:
+            cpu: 2
+            memory: 6Gi
+        env:         
+        - name: IS_TEMPORAL_WORKER
+          value: "true"
+        - name: WORKER_HOST
+          value: "0.0.0.0"
+        - name: WORKER_PORT
+          value: "8000"
+        - name: LOG_LEVEL
+          value: INFO
+        - name: PORT
+          value: "8000"
+        - name: UVICORN_PORT
+          value: "8000"
+        envFrom:         
+        - secretRef:
+            name: llamacloud-license-key
+        - configMapRef:
+            name: bucket-config
+        - configMapRef:
+            name: common-config
+        - configMapRef:
+            name: extract-config
+        - configMapRef:
+            name: urls-config
+        - configMapRef:
+            name: temporal-connection-config
+        - configMapRef:
+            name: "temporal-jobs-worker"
+        - secretRef:
+            name: bucket-secret
+        - secretRef:
+            name: "postgresql-secret"
+        - secretRef:
+            name: "redis-secret"
+        - secretRef:
+            name: "oidc-secret"
+        - secretRef:
+            name: "openai-api-key-secret"
+        volumeMounts:        
+        - mountPath: /tmp
+          name: tmp      
+      volumes:       
+      - emptyDir: {}
+        name: tmp
+      terminationGracePeriodSeconds: 30
+---
+# Source: llamacloud/templates/llamacloud/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "llamacloud-temporal-parse"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-temporal-parse"
+  annotations:     
+spec:
+  replicas: 
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:       
+      app.kubernetes.io/instance: llamacloud
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: "llamacloud-temporal-parse"
+  template:
+    metadata:
+      labels:         
+        app.kubernetes.io/instance: llamacloud
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: "llamacloud-temporal-parse"
+      annotations:         
+    spec:
+      imagePullSecrets: 
+        []
+      serviceAccountName: "llamacloud-temporal-parse"
+      securityContext:         
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: "llamacloud-temporal-parse"
+        securityContext:           
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        image: "docker.io/llamaindex/llamacloud-llamaparse:0.8.5"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8003
+          protocol: TCP
+        command: 
+          - /bin/sh
+          - -c
+          - LD_PRELOAD=$JEMALLOC_PATH exec node --max-old-space-size=$MAX_OLD_SPACE_SIZE dist/worker/temporal/worker.js
+        livenessProbe:           
+          httpGet:
+            path: /healthcheck
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 10
+        readinessProbe:           
+          httpGet:
+            path: /healthcheck
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 10
+        startupProbe:           
+          httpGet:
+            path: /healthcheck
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 10
+        resources:           
+          requests:
+            cpu: 3
+            memory: 6Gi
+          limits:
+            cpu: 7
+            memory: 13Gi
+        env:         
+        - name: LOG_LEVEL
+          value: INFO
+        - name: PORT
+          value: "8003"
+        - name: UVICORN_PORT
+          value: "8003"
+        envFrom:         
+        - secretRef:
+            name: llamacloud-license-key
+        - configMapRef:
+            name: bucket-config
+        - configMapRef:
+            name: urls-config
+        - configMapRef:
+            name: concurrency-config
+        - configMapRef:
+            name: temporal-connection-config
+        - configMapRef:
+            name: llamacloud-temporal-parse
+        - secretRef:
+            name: bucket-secret
+        - secretRef:
+            name: "openai-api-key-secret"
+        volumeMounts:        
+        - mountPath: /tmp
+          name: tmp      
+      volumes:       
+      - emptyDir: {}
+        name: tmp
+      terminationGracePeriodSeconds: 30
+---
+# Source: llamacloud/templates/llamacloud/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "llamacloud-telemetry"
+  namespace: "llamacloud"
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: "llamacloud-telemetry"
+  annotations:     
+spec:
+  replicas: 
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:       
+      app.kubernetes.io/instance: llamacloud
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: "llamacloud-telemetry"
+  template:
+    metadata:
+      labels:         
+        app.kubernetes.io/instance: llamacloud
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: "llamacloud-telemetry"
+      annotations:         
+    spec:
+      imagePullSecrets: 
+        []
+      serviceAccountName: "llamacloud-telemetry"
+      securityContext:         
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: "llamacloud-telemetry"
+        securityContext:           
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        image: "docker.io/llamaindex/llamacloud-backend:0.8.5"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8005
+          protocol: TCP
+        command: 
+          - start_usage_service
+        livenessProbe:           
+          httpGet:
+            path: /health_check
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 5
+          failureThreshold: 30
+        readinessProbe:           
+          httpGet:
+            path: /health_check
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 5
+          failureThreshold: 30
+        startupProbe:           
+          httpGet:
+            path: /health_check
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 5
+          failureThreshold: 30
+        resources:           
+          requests:
+            cpu: 1
+            memory: 1Gi
+          limits:
+            cpu: 2
+            memory: 2Gi
+        env:         
+        - name: LOG_LEVEL
+          value: INFO
+        - name: PORT
+          value: "8005"
+        - name: UVICORN_PORT
+          value: "8005"
+        envFrom:         
+        - secretRef:
+            name: llamacloud-license-key
+        - secretRef:
+            name: "postgresql-secret"
+        - secretRef:
+            name: "redis-secret"
+        volumeMounts:        
+        - mountPath: /tmp
+          name: tmp
+      volumes:       
+      - emptyDir: {}
+        name: tmp
+      terminationGracePeriodSeconds: 30
+---
+# Source: llamacloud/templates/llamacloud/job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: llamacloud-temporal-search-attributes
+  labels:     
+    app.kubernetes.io/instance: llamacloud
+    app.kubernetes.io/managed-by: Helm
+  annotations:     
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:         
+        app.kubernetes.io/instance: llamacloud
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: temporal-search-attributes-job
+    spec:
+      restartPolicy: OnFailure
+      imagePullSecrets: 
+        []
+      containers:
+      - name: create-search-attributes
+        image: "docker.io/temporalio/admin-tools:1.31.0"
+        imagePullPolicy: IfNotPresent
+        command:
+          # Use /bin/sh, not /bin/bash: the configured image
+          # (temporalio/admin-tools:1.31.0 by default) ships only busybox sh.
+          # The script body below is POSIX-compatible.
+          - /bin/sh
+          - -c
+          - |
+            set -e
+            TEMPORAL_NAMESPACE="llamacloud"
+            MAX_RETRIES=30
+            RETRY_INTERVAL=10
+
+            echo "Waiting for Temporal server to be ready..."
+            for i in $(seq 1 $MAX_RETRIES); do
+              if temporal operator cluster health 2>/dev/null | grep -q SERVING; then
+                echo "Temporal server is ready"
+                break
+              fi
+              if [ $i -eq $MAX_RETRIES ]; then
+                echo "ERROR: Temporal server not ready after $MAX_RETRIES attempts"
+                exit 1
+              fi
+              echo "Waiting for Temporal server... (attempt $i/$MAX_RETRIES)"
+              sleep $RETRY_INTERVAL
+            done
+
+            echo "Ensuring Temporal Namespace exists: $TEMPORAL_NAMESPACE"
+            for i in $(seq 1 $MAX_RETRIES); do
+              # Check if namespace already exists
+              if temporal operator namespace describe --namespace "$TEMPORAL_NAMESPACE" >/dev/null 2>&1; then
+                echo "Namespace $TEMPORAL_NAMESPACE already exists"
+                break
+              fi
+              # Try to create the namespace
+              if temporal operator namespace create --namespace "$TEMPORAL_NAMESPACE" --retention 7d 2>&1; then
+                echo "Namespace $TEMPORAL_NAMESPACE created successfully"
+                break
+              fi
+              if [ $i -eq $MAX_RETRIES ]; then
+                echo "ERROR: Failed to create namespace after $MAX_RETRIES attempts"
+                exit 1
+              fi
+              echo "Retrying namespace creation... (attempt $i/$MAX_RETRIES)"
+              sleep $RETRY_INTERVAL
+            done
+
+            echo "Waiting for namespace to be queryable..."
+            for i in $(seq 1 30); do
+              if temporal operator search-attribute list --namespace "$TEMPORAL_NAMESPACE" >/dev/null 2>&1; then
+                echo "Namespace is queryable"
+                break
+              fi
+              if [ $i -eq 30 ]; then
+                echo "ERROR: Namespace not queryable after 30 attempts"
+                exit 1
+              fi
+              sleep 1
+            done
+
+            echo "Ensuring search attributes exist..."
+            echo "Ensuring search attribute exists: Project (Keyword)"
+            # Check if attribute already exists
+            if temporal operator search-attribute list --namespace "$TEMPORAL_NAMESPACE" 2>/dev/null | grep -q "Project"; then
+              echo "Search attribute Project already exists"
+            else
+              if temporal operator search-attribute create --namespace "$TEMPORAL_NAMESPACE" --name Project --type Keyword 2>&1; then
+                echo "Search attribute Project created successfully"
+              else
+                echo "ERROR: Failed to create search attribute Project"
+                exit 1
+              fi
+            fi
+            echo "Ensuring search attribute exists: Organization (Keyword)"
+            # Check if attribute already exists
+            if temporal operator search-attribute list --namespace "$TEMPORAL_NAMESPACE" 2>/dev/null | grep -q "Organization"; then
+              echo "Search attribute Organization already exists"
+            else
+              if temporal operator search-attribute create --namespace "$TEMPORAL_NAMESPACE" --name Organization --type Keyword 2>&1; then
+                echo "Search attribute Organization created successfully"
+              else
+                echo "ERROR: Failed to create search attribute Organization"
+                exit 1
+              fi
+            fi
+            echo "Search attributes setup completed"
+        env:
+        - name: TEMPORAL_CLI_ADDRESS
+          value: "temporal.internal:7233"
+        - name: TEMPORAL_ADDRESS
+          value: "temporal.internal:7233"

@@ -1,0 +1,14 @@
+license:
+  key: non-empty
+postgresql:
+  host: pg.example.com
+  port: "5432"
+redis:
+  host: redis.example.com
+  port: "6379"
+config:
+  llms:
+    anthropic:
+      apiKey: sk-ant-only
+  storageBuckets:
+    provider: aws

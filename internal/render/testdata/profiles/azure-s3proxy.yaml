@@ -1,0 +1,16 @@
+# azure-s3proxy overlay: non-AWS (Azure) object storage, which requires the
+# s3proxy shim. Layers on top of the base existing-endpoint substrate and
+# exercises the s3proxy sidecar/secret rendering path.
+config:
+  storageBuckets:
+    provider: azure
+    s3proxy:
+      enabled: true
+      config:
+        S3PROXY_ENDPOINT: "http://0.0.0.0:8080"
+        S3PROXY_AUTHORIZATION: "none"
+        JCLOUDS_PROVIDER: "azureblob-sdk"
+        JCLOUDS_AZUREBLOB_AUTH: "azureKey"
+        JCLOUDS_IDENTITY: "fixtureaccount"
+        JCLOUDS_CREDENTIAL: "fixture-key"
+        JCLOUDS_ENDPOINT: "https://fixtureaccount.blob.core.windows.net"

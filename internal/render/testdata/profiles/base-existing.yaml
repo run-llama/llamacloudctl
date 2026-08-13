@@ -1,0 +1,46 @@
+# base-existing: the shared existing-endpoint substrate every "core" render
+# profile layers on top of. It configures license, an embeddings-capable LLM,
+# basic auth, and external endpoints for every data service the chart requires.
+# Profile overlays (loaded AFTER this file, so they win on conflict) set only the
+# capability under test (e.g. the object-storage provider).
+license:
+  key: not-a-real-jwt-but-non-empty
+postgresql:
+  host: pg.internal
+  port: "5432"
+  database: llamacloud
+  username: llama
+  password: pgpass
+redis:
+  host: redis.internal
+  port: "6379"
+  db: 0
+  password: redispass
+mongodb:
+  enabled: true
+  host: mongo.internal
+  port: "27017"
+  username: mongo
+  password: mongopass
+  mongodb_url: mongodb://mongo:mongopass@mongo.internal:27017/llamacloud
+rabbitmq:
+  enabled: true
+  host: rmq.internal
+  port: "5672"
+  username: rabbit
+  password: rabbitpass
+  connectionString: amqp://rabbit:rabbitpass@rmq.internal:5672/
+temporal:
+  disabled: false
+  deploy: false
+  host: temporal.internal
+  port: 7233
+config:
+  llms:
+    openai:
+      apiKey: sk-openai-fixture
+  authentication:
+    basicAuth:
+      enabled: true
+      validEmailDomain: example.com
+      jwtSecret: fixture-jwt-secret

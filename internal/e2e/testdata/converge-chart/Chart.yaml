@@ -1,0 +1,16 @@
+apiVersion: v2
+name: llamacloud-e2e-probe
+description: |
+  Stand-in for the LlamaCloud chart in the kind end-to-end suite. It is passed to
+  `install` as --chart, so the REAL install flow (values assembly, guards,
+  preflight, approval, in-cluster data-service provisioning, the embedded Helm
+  SDK install, and rollout streaming) executes unchanged while the workload it
+  installs is one that can actually converge on kind using public images only.
+
+  Its pods gate readiness on reaching the in-cluster PostgreSQL and Redis at the
+  endpoints and credentials the CLI wired into the values (internal/install
+  recipe.go), so a green rollout proves that wiring is correct against a live
+  cluster rather than only against a fixture.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

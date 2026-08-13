@@ -1,0 +1,6 @@
+apiVersion: v2
+name: llamacloud
+description: Minimal render fixture. templates/cm.yaml renders only when config.authentication is set, which is how the render check's FAIL path is exercised without a network fetch of the real chart.
+type: application
+version: 0.0.0-test
+appVersion: 0.0.0-test

@@ -1,0 +1,50 @@
+# Cuts a full multi-OS / multi-arch release whenever a SemVer tag is pushed.
+#
+#   git tag v1.2.0 && git push origin v1.2.0
+#
+# GoReleaser cross-compiles every target, packages archives + deb/rpm/apk,
+# writes checksums, cosign-keyless-signs them, and publishes a GitHub Release.
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write # create the GitHub Release + upload assets
+  id-token: write # cosign keyless signing via GitHub OIDC
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history + tags so the changelog is complete
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          # The Release is published to the PUBLIC distribution repo
+          # (run-llama/llamacloudctl) so customers can install without access to
+          # this private source repo. The default GITHUB_TOKEN is scoped to THIS
+          # repo only and cannot write a Release cross-repo, so we use
+          # RELEASE_TOKEN: a fine-grained PAT (or GitHub App token) with
+          # "Contents: write" on run-llama/llamacloudctl. Falls back to
+          # GITHUB_TOKEN if unset (useful for --snapshot dry runs).
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}

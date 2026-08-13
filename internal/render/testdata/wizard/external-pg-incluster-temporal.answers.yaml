@@ -1,0 +1,44 @@
+# Scripted answers for a guided-wizard run whose PostgreSQL is an existing
+# EXTERNAL endpoint (an RDS-shaped host) and whose Temporal is deployed in-cluster
+# as the chart's subchart — the exact combination that made every managed-postgres
+# install unconvergeable before the Temporal managed/external SQL-TLS fix: the subchart's schema-setup Job (a pre-install
+# hook) connected without TLS and RDS rejected it at pg_hba ("no encryption").
+#
+# Consumed by TestWizardExternalPostgres_TemporalSubchartGetsSQLTLS, which drives
+# the REAL wizard with these answers and renders the result against the PINNED
+# chart, asserting the subchart actually consumes the TLS keys the installer
+# writes. It is deliberately NOT a golden profile: the assertion is about a handful
+# of env vars in the schema job, not the whole manifest.
+"License source": "paste JWT"
+"License JWT": "not-a-real-jwt-but-non-empty"
+
+"Authentication mode": "basic"
+"Basic auth valid email domain": "example.com"
+"Basic auth JWT secret": "fixture-jwt-secret"
+
+"LLM providers (select at least one embeddings-capable provider)": ["openai"]
+"openai API key": "sk-openai-fixture"
+
+"Customize data services and object storage? (default: install databases in-cluster + use an existing S3 bucket you name)": true
+
+"Object storage provider": "aws"
+"AWS object storage: create buckets for me, or use existing?": "use existing buckets"
+"Existing bucket name (applied to all bucket purposes)": "llama-fixture-bucket"
+"Object storage credentials": "IRSA (IAM role for service account)"
+"IAM role ARN for S3 access (eks.amazonaws.com/role-arn; empty = use the node/instance role)": ""
+
+"postgres: how should it be provided?": "existing endpoint"
+"postgres host": "acme-llamacloud-pg.abc123.us-east-1.rds.amazonaws.com"
+"postgres port": "5432"
+"postgres username": "llamacloud"
+"postgres password": "pgpass"
+"postgres database": "llamacloud"
+
+"redis: how should it be provided?": "existing endpoint"
+"redis host": "redis.internal"
+"redis port": "6379"
+"redis username": ""
+"redis password": "redispass"
+"redis db number": "0"
+
+"Temporal: how should it be provided?": "install in-cluster"

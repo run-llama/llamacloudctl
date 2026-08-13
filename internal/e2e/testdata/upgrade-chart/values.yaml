@@ -1,0 +1,22 @@
+# Defaults for the kind end-to-end upgrade-target probe chart.
+#
+# Identical to testdata/converge-chart/values.yaml: postgresql.* and redis.* are
+# the SAME keys the real LlamaCloud chart consumes, left empty on purpose so the
+# upgrade carries forward the endpoints/credentials the baseline install wired in
+# (upgrade.Run migrates the installed release's stored Config as userValues).
+postgresql:
+  host: ""
+  port: "5432"
+  database: llamacloud
+  username: llamacloud
+
+redis:
+  host: ""
+  port: "6379"
+  password: ""
+
+# Harness-only knobs, identical to converge-chart.
+e2e:
+  postgresImage: postgres:17-alpine
+  redisImage: redis:8-alpine
+  redisProbe: true

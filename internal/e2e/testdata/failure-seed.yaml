@@ -1,0 +1,53 @@
+# Non-interactive install input for the ROLLOUT-FAILURE case.
+#
+# It differs from install-seed.yaml in two deliberate ways:
+#
+#  1. postgresql/redis/temporal are configured as EXISTING endpoints, so the run
+#     provisions no in-cluster data services. The point of this test is the
+#     rollout timeout path, not provisioning, and skipping it keeps the case fast.
+#     The endpoints do not need to exist — the pod never starts.
+#  2. e2e.postgresImage names a tag that cannot be pulled, so the workload can
+#     never converge. That is what drives the install's wait to its timeout and
+#     exercises the streamed problem lines plus the post-mortem pod diagnosis.
+#
+# The e2e.* block is consumed only by the harness probe chart. It must never be
+# used against the real chart, whose schema sets additionalProperties: false at
+# the top level.
+license:
+  key: e2e-not-a-real-license
+
+config:
+  llms:
+    openAi:
+      apiKey: e2e-not-a-real-openai-key
+  authentication:
+    basicAuth:
+      enabled: true
+      validEmailDomain: example.invalid
+      jwtSecret: e2e-not-a-real-jwt-secret
+  parseOcr:
+    gpu: false
+  storageBuckets:
+    provider: aws
+
+postgresql:
+  host: postgres.example.invalid
+  port: "5432"
+  database: llamacloud
+  username: llamacloud
+  password: e2e-not-a-real-password
+
+redis:
+  host: redis.example.invalid
+  port: "6379"
+  password: e2e-not-a-real-password
+
+temporal:
+  disabled: true
+  deploy: false
+
+e2e:
+  # A tag that does not exist in the public registry: the kubelet reports
+  # ErrImagePull -> ImagePullBackOff and the pod never becomes ready.
+  postgresImage: postgres:0.0.0-llamacloudctl-e2e-does-not-exist
+  redisProbe: false

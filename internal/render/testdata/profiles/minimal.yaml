@@ -1,0 +1,35 @@
+# minimal: the smallest configuration that passes the guards AND renders. The
+# optional data services (mongodb, rabbitmq) are disabled and Temporal is turned
+# off entirely, leaving only the always-required postgres + redis, one
+# embeddings-capable LLM, basic auth, and default (AWS) object storage.
+license:
+  key: not-a-real-jwt-but-non-empty
+postgresql:
+  host: pg.internal
+  port: "5432"
+  database: llamacloud
+  username: llama
+  password: pgpass
+redis:
+  host: redis.internal
+  port: "6379"
+  db: 0
+  password: redispass
+mongodb:
+  enabled: false
+rabbitmq:
+  enabled: false
+temporal:
+  disabled: true
+  deploy: false
+config:
+  llms:
+    openai:
+      apiKey: sk-openai-fixture
+  storageBuckets:
+    provider: aws
+  authentication:
+    basicAuth:
+      enabled: true
+      validEmailDomain: example.com
+      jwtSecret: fixture-jwt-secret

@@ -1,0 +1,2 @@
+# Deliberately empty: every test supplies its own values so the fixture cannot
+# accidentally satisfy the required data-service keys the template demands.

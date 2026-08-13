@@ -1,0 +1,23 @@
+{{- if not (.Values.postgresql).host }}
+{{- fail ".Values.postgresql.host cannot be empty. Please provide a valid postgres host" }}
+{{- end }}
+{{- if not (.Values.postgresql).password }}
+{{- fail ".Values.postgresql.password cannot be empty. Please provide a valid postgres password" }}
+{{- end }}
+{{- if not (.Values.redis).host }}
+{{- fail ".Values.redis.host cannot be empty. Please provide a valid redis host" }}
+{{- end }}
+{{- $temporalAddr := "" }}
+{{- if (.Values.temporal).deploy }}
+{{- $store := index .Values "temporal-subchart" "server" "config" "persistence" "datastores" "default" "sql" }}
+{{- $temporalAddr = required "Please specify connectAddr for default store" $store.connectAddr }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-managed-render-probe
+  namespace: {{ .Release.Namespace }}
+data:
+  postgresHost: {{ .Values.postgresql.host | quote }}
+  redisHost: {{ .Values.redis.host | quote }}
+  temporalConnectAddr: {{ $temporalAddr | quote }}

@@ -1,0 +1,77 @@
+# Tier-3 end-to-end validation on an EPHEMERAL kind cluster — the ONLY e2e CI.
+#
+# This is the enforcement point for the repo owner's hard rule: CI never deploys
+# to, assumes a role into, or reaches a real cluster or cloud account. There is
+# no OIDC token, no environment, and no secrets here — `contents: read` is the
+# whole grant. The suite creates and destroys a throwaway kind cluster inside the
+# runner (internal/e2e/harness_test.go owns that lifecycle) and scrubs the cloud
+# credential environment before any test body runs, so install/upgrade/uninstall
+# are exercised against a REAL Kubernetes API server without ever touching a
+# cloud account or a customer cluster.
+#
+# release-cut.yml gates a release on this workflow having concluded successfully
+# on the target commit.
+name: e2e-kind
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  # One kind e2e run at a time per ref; a newer commit cancels an in-flight older
+  # one. Each run creates its own cluster in the runner, so this is about runner
+  # time, not cluster contention.
+  group: e2e-kind-${{ github.ref }}
+  cancel-in-progress: true
+
+# Hard rule: no cloud/cluster access. contents:read is the entire grant — no
+# OIDC token, no environment, no secrets. A broader default token is NOT inherited
+# because this block is declared explicitly.
+permissions:
+  contents: read
+
+jobs:
+  e2e-kind:
+    runs-on: ubuntu-latest
+    # The suite pulls the kind node image plus the bitnami PostgreSQL/Redis and
+    # probe images onto a cold runner and drives real install + upgrade +
+    # uninstall rollouts; E2E_KIND_TIMEOUT below bounds the suite, this bounds
+    # the whole job.
+    timeout-minutes: 50
+    env:
+      # kind release to install as a plain binary (the harness, not this
+      # workflow, creates the cluster — see below).
+      KIND_VERSION: v0.24.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install kind (binary only — the suite owns cluster lifecycle)
+        # Deliberately NOT helm/kind-action: internal/e2e/harness_test.go
+        # ensureCluster creates/reuses/deletes the cluster itself under a
+        # dedicated gitignored kubeconfig. Creating a cluster here would fight
+        # that and defeat the safety guard. We only need the `kind` binary on
+        # PATH.
+        run: |
+          set -euo pipefail
+          curl -fsSLo ./kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64"
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+          kind version
+
+      - name: Run the kind end-to-end suite
+        # make e2e-kind -> scripts/e2e-kind.sh, which sets LLAMACLOUDCTL_E2E=1,
+        # scrubs the cloud credential environment, creates the throwaway cluster,
+        # runs the suite with the Makefile build tags, and deletes the cluster
+        # again. No `make build` step: the suite drives install.Run/upgrade.Run/
+        # uninstall.Run in-process, so no compiled binary is needed.
+        env:
+          E2E_KIND_TIMEOUT: 40m
+        run: make e2e-kind

@@ -1,0 +1,18 @@
+# anthropic-guard: a rejection profile. Anthropic exposes no embeddings model,
+# so an Anthropic-only LLM configuration must FAIL the embeddings guard before
+# any chart is rendered. This profile asserts the guard fires (ExpectGuardFail on
+# the "LLM providers" check) and therefore has no golden manifest.
+license:
+  key: not-a-real-jwt-but-non-empty
+postgresql:
+  host: pg.internal
+  port: "5432"
+redis:
+  host: redis.internal
+  port: "6379"
+config:
+  llms:
+    anthropic:
+      apiKey: sk-ant-only
+  storageBuckets:
+    provider: aws

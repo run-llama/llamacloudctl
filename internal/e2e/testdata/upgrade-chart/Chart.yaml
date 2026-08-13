@@ -1,0 +1,18 @@
+apiVersion: v2
+name: llamacloud-e2e-probe
+description: |
+  Upgrade target for the kind end-to-end suite: the SAME probe app as
+  testdata/converge-chart, bumped one version so a real Helm upgrade transaction
+  can be driven on kind (TestE2EUpgradeConvergesAgainstKind). It stands in for a
+  new LlamaCloud chart release the operator upgrades an existing install to, so
+  upgrade.Run's real embedded-Helm upgrade + rollout wait execute against a live
+  API server.
+
+  It carries a single benign pod-template delta versus converge-chart (a
+  template annotation) so the upgrade actually rolls the workload — a new pod
+  must be created and gate READY on the SAME in-cluster PostgreSQL and Redis the
+  baseline provisioned, so the Helm --wait the upgrade blocks on observes a real
+  rollout and proves the CLI's wiring survives the upgrade.
+type: application
+version: 0.2.0
+appVersion: "0.2.0"

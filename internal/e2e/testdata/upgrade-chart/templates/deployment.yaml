@@ -1,0 +1,81 @@
+{{/*
+The datastore probe. Identical to converge-chart's template EXCEPT for the one
+benign pod-template annotation below. Each container idles and reports READY only
+once it can reach the data service at the endpoint/credential the install flow
+wired into the values, so `helm --wait` (and therefore the CLI's rollout
+streaming) only converges when that wiring actually works against the live
+cluster.
+*/}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-datastore-probe
+  labels:
+    app.kubernetes.io/name: llamacloud-e2e-probe
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: llamacloud-e2e-probe
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: llamacloud-e2e-probe
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      # Benign, schemaless delta versus converge-chart: bumping this annotation
+      # changes the pod-template hash, so the upgrade rolls a new ReplicaSet whose
+      # pod must reach READY against the carried-forward in-cluster PostgreSQL and
+      # Redis. That gives the upgrade's helm --wait a real rollout to observe,
+      # rather than an already-Ready workload it would pass through instantly.
+      annotations:
+        e2e.llamacloudctl/probe-generation: "0.2.0"
+    spec:
+      containers:
+        - name: postgres-probe
+          image: {{ .Values.e2e.postgresImage | quote }}
+          command: ["sh", "-c", "sleep infinity"]
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -h
+                - {{ .Values.postgresql.host | quote }}
+                - -p
+                - {{ .Values.postgresql.port | quote }}
+                - -U
+                - {{ .Values.postgresql.username | quote }}
+                - -d
+                - {{ .Values.postgresql.database | quote }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 60
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+{{- if .Values.e2e.redisProbe }}
+        - name: redis-probe
+          image: {{ .Values.e2e.redisImage | quote }}
+          command: ["sh", "-c", "sleep infinity"]
+          env:
+            - name: REDISCLI_AUTH
+              value: {{ .Values.redis.password | quote }}
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - -h
+                - {{ .Values.redis.host | quote }}
+                - -p
+                - {{ .Values.redis.port | quote }}
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 60
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+{{- end }}

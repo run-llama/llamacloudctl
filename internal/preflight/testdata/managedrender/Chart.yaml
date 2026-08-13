@@ -1,0 +1,13 @@
+apiVersion: v2
+name: llamacloud
+description: >-
+  Render fixture that mirrors the REAL llamacloud chart's data-service
+  preconditions: it hard-fails without postgresql.host / redis.host (verbatim the
+  messages templates/llamacloud/secrets/data.postgresql.yaml and its redis sibling
+  emit), and without a Temporal datastore connectAddr when temporal.deploy is on
+  (the temporal subchart's own required-message). Those three failures are exactly
+  what a MANAGED install hits at values-phase time, before provisioning has created
+  the endpoints — the false FAIL the placeholder substitution exists to remove.
+type: application
+version: 0.0.0-test
+appVersion: 0.0.0-test

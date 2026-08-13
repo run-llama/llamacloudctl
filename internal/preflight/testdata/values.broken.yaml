@@ -1,0 +1,19 @@
+# Deliberately broken: missing license, gpu true, old Temporal shape
+config:
+  llms:
+    anthropic:
+      apiKey: sk-ant-xxx
+  parseOcr:
+    gpu: true
+temporal:
+  deploy: true
+  server:
+    config:
+      persistence:
+        default:
+          driver: sql
+        visibility:
+          driver: sql
+postgresql:
+  auth:
+    password: pgpass

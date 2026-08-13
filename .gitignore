@@ -1,0 +1,31 @@
+.venv/
+__pycache__/
+*.egg-info/
+/bin/
+
+# GoReleaser build output (archives, packages, checksums, signatures).
+/dist/
+
+# Tier-2 render harness: the pinned llamacloud chart is pulled + cached here on
+# first run. Chart bytes are NEVER committed — only the golden manifests are.
+/internal/render/testdata/chart-cache/
+
+# kind end-to-end harness: the DEDICATED kubeconfig for the throwaway kind
+# cluster is written here. Never committed — and never the developer's default
+# kubeconfig, which on a laptop points at production clusters.
+/internal/e2e/testdata/tmp/
+
+# Local demo runbook (references the dev cluster + secret handling) — not committed.
+/demo/
+
+# Generated/working values files that hold real cluster credentials — never
+# commit. `llamacloudctl install` writes <namespace>-values.yaml at the repo
+# root, so ignore that whole pattern (any namespace), not just known names.
+# Anchored to root with a leading slash so it never hides committed test
+# fixtures under internal/*/testdata/ or scratch-chart/.
+/*-values.yaml
+
+
+# wizard output values files (contain generated credentials) — never commit
+/*-values.yaml
+/*-values-*.yaml

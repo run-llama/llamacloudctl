@@ -1,0 +1,42 @@
+# Scripted answers for a full guided-wizard run with OIDC auth, keyed by prompt
+# title. Same substrate as basic-auth.answers.yaml but exercises the OIDC path —
+# the mapping that was buggy before this pass (wrote `issuer` instead of
+# `discoveryUrl` and never set `enabled`). Consumed by the wizard-driven render
+# profile. The rendered OIDC secret contains a randAlphaNum SESSION_SECRET_KEY,
+# which the harness normalizes before golden comparison (see render.go).
+"License source": "paste JWT"
+"License JWT": "not-a-real-jwt-but-non-empty"
+
+"Authentication mode": "oidc"
+"OIDC discovery URL": "https://id.example.com/.well-known/openid-configuration"
+"OIDC client ID": "llamacloud-client"
+"OIDC client secret": "oidc-client-secret-fixture"
+
+"LLM providers (select at least one embeddings-capable provider)": ["openai"]
+"openai API key": "sk-openai-fixture"
+
+"Customize data services and object storage? (default: install databases in-cluster + use an existing S3 bucket you name)": true
+
+"Object storage provider": "aws"
+"AWS object storage: create buckets for me, or use existing?": "use existing buckets"
+"Existing bucket name (applied to all bucket purposes)": "llama-fixture-bucket"
+"Object storage credentials": "IRSA (IAM role for service account)"
+"IAM role ARN for S3 access (eks.amazonaws.com/role-arn; empty = use the node/instance role)": ""
+
+"postgres: how should it be provided?": "existing endpoint"
+"postgres host": "pg.internal"
+"postgres port": "5432"
+"postgres username": "llama"
+"postgres password": "pgpass"
+"postgres database": "llamacloud"
+
+"redis: how should it be provided?": "existing endpoint"
+"redis host": "redis.internal"
+"redis port": "6379"
+"redis username": ""
+"redis password": "redispass"
+"redis db number": "0"
+
+"Temporal: how should it be provided?": "external endpoint"
+"temporal host": "temporal.internal"
+"temporal port": "7233"

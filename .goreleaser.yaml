@@ -1,0 +1,157 @@
+# GoReleaser configuration for llamacloudctl.
+#
+# One `git tag vX.Y.Z && git push --tags` produces a full multi-OS / multi-arch
+# release: static binaries, archives, checksums, deb/rpm packages, and a
+# cosign-keyless signature over the checksums file — all attached to a GitHub
+# Release. Run `goreleaser release --snapshot --clean` locally to dry-run.
+#
+# Docs: https://goreleaser.com
+version: 2
+
+project_name: llamacloudctl
+
+before:
+  hooks:
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: llamacloudctl
+    main: ./cmd/llamacloudctl
+    binary: llamacloudctl
+    # Fully static, portable binaries: no libc dependency, so one linux/amd64
+    # artifact runs on glibc *and* musl (Alpine), old and new distros alike.
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+      # Build tags for the embedded replicatedhq/troubleshoot analyzers: they select
+      # the pure-Go stubs of containers/image + containers/storage so CGO_ENABLED=0
+      # cross-builds work on every goos/goarch below. This MUST stay a SINGLE
+      # comma-separated entry — a second `-tags` flag resets the list rather than
+      # appending to it. Keep in sync with TAGS in the Makefile and run.build-tags
+      # in .golangci.yml.
+      - -tags=netgo,containers_image_ostree_stub,exclude_graphdriver_devicemapper,exclude_graphdriver_btrfs,containers_image_openpgp
+    ldflags:
+      # -s -w strips DWARF + symbol tables (smaller binary). The -X injects the
+      # release version + provenance (commit, build date) into the same vars the
+      # Makefile targets, so `llamacloudctl version` reports exactly what shipped.
+      - -s -w
+      - -X github.com/run-llama/llamacloudctl/internal/cli.Version={{ .Version }}
+      - -X github.com/run-llama/llamacloudctl/internal/cli.Commit={{ .ShortCommit }}
+      - -X github.com/run-llama/llamacloudctl/internal/cli.Date={{ .CommitDate }}
+    mod_timestamp: "{{ .CommitTimestamp }}" # reproducible builds
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    # No 32-bit / arm-v7 targets: LlamaParse clusters are 64-bit. Add here if a
+    # customer ever needs one.
+
+archives:
+  - id: default
+    ids:
+      - llamacloudctl
+    # e.g. llamacloudctl_1.2.0_linux_amd64.tar.gz  — parsed verbatim by install.sh.
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - README.md
+      - LICENSE*
+
+# Native Linux packages for enterprise fleets that install via apt/yum/zypper.
+nfpms:
+  - id: packages
+    package_name: llamacloudctl
+    ids:
+      - llamacloudctl
+    vendor: LlamaIndex
+    homepage: https://github.com/run-llama/llamacloudctl
+    maintainer: LlamaIndex <support@llamaindex.ai>
+    description: Manage customer-managed LlamaCloud / LlamaParse Kubernetes deployments.
+    license: Apache-2.0
+    formats:
+      - deb
+      - rpm
+      - apk
+    bindir: /usr/bin
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+# Cosign keyless signing (Sigstore + GitHub OIDC): no private keys to manage.
+# Signs the checksums file; verifying it transitively verifies every artifact.
+# Requires `id-token: write` in the release workflow.
+signs:
+  - id: cosign-keyless
+    cmd: cosign
+    signature: "${artifact}.sig"
+    certificate: "${artifact}.pem"
+    args:
+      - sign-blob
+      - "--output-signature=${signature}"
+      - "--output-certificate=${certificate}"
+      - "${artifact}"
+      - "--yes"
+    artifacts: checksum
+    output: true
+
+changelog:
+  sort: asc
+  use: github
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\(.+\))??!?:.+$'
+      order: 0
+    - title: Bug fixes
+      regexp: '^.*?fix(\(.+\))??!?:.+$'
+      order: 1
+    - title: Others
+      order: 999
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^ci:"
+      - "Merge pull request"
+      - "Merge branch"
+
+release:
+  # Public distribution repo. The source lives in the private run-llama/llamacloudctl;
+  # customer-facing binaries + install.sh are published here so anyone can install.
+  # Cross-repo publishing needs GITHUB_TOKEN to be a token with write access to this
+  # repo (see .github/workflows/release.yml — RELEASE_TOKEN secret).
+  github:
+    owner: run-llama
+    name: llamacloudctl
+  draft: false
+  # Tags like v1.2.0-rc.1 are published as pre-releases automatically.
+  prerelease: auto
+  name_template: "llamacloudctl {{ .Tag }}"
+  footer: |
+    ## Install
+
+    ```sh
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/run-llama/llamacloudctl/main/install.sh)"
+    ```
+
+    Verify the checksums signature (cosign keyless):
+
+    ```sh
+    cosign verify-blob checksums.txt \
+      --signature checksums.txt.sig \
+      --certificate checksums.txt.pem \
+      --certificate-identity-regexp 'https://github.com/run-llama/llamacloudctl' \
+      --certificate-oidc-issuer 'https://token.actions.githubusercontent.com'
+    ```

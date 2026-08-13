@@ -1,0 +1,6 @@
+apiVersion: v2
+name: llamacloud
+description: Minimal test fixture mirroring the llamacloud chart's schema-relevant keys.
+type: application
+version: 0.0.0-test
+appVersion: 0.0.0-test

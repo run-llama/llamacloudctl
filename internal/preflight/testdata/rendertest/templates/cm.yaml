@@ -1,0 +1,13 @@
+{{- if not .Values.config }}
+{{- fail "config is required" }}
+{{- end }}
+{{- if not .Values.config.authentication }}
+{{- fail "config.authentication is required" }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-render-probe
+  namespace: {{ .Release.Namespace }}
+data:
+  ok: "true"

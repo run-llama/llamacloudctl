@@ -1,0 +1,43 @@
+# Scripted answers for a full guided-wizard run selecting the GEMINI LLM provider
+# and IRSA (IAM Roles for Service Accounts) object-storage auth, keyed by prompt
+# title. Consumed by the wizard-gemini-irsa render profile: the harness feeds these
+# to the NonInteractive prompter, runs the REAL RunWizard, and renders its output
+# against the pinned chart — proving (1) gemini maps to config.llms.gemini and
+# renders the gemini secret, and (2) IRSA annotates the workload ServiceAccounts
+# with eks.amazonaws.com/role-arn and writes NO static AWS keys.
+"License source": "paste JWT"
+"License JWT": "not-a-real-jwt-but-non-empty"
+
+"Authentication mode": "basic"
+"Basic auth valid email domain": "example.com"
+"Basic auth JWT secret": "fixture-jwt-secret"
+
+"LLM providers (select at least one embeddings-capable provider)": ["gemini"]
+"gemini API key": "gm-gemini-fixture"
+
+"Customize data services and object storage? (default: install databases in-cluster + use an existing S3 bucket you name)": true
+
+"Object storage provider": "aws"
+"AWS object storage: create buckets for me, or use existing?": "create buckets for me"
+"S3 bucket name to create (applied to all bucket purposes)": "gemini-irsa-bucket"
+"AWS region": "us-east-1"
+"Object storage credentials": "IRSA (IAM role for service account)"
+"IAM role ARN for S3 access (eks.amazonaws.com/role-arn; empty = use the node/instance role)": "arn:aws:iam::123456789012:role/llamacloud-s3"
+
+"postgres: how should it be provided?": "existing endpoint"
+"postgres host": "pg.internal"
+"postgres port": "5432"
+"postgres username": "llama"
+"postgres password": "pgpass"
+"postgres database": "llamacloud"
+
+"redis: how should it be provided?": "existing endpoint"
+"redis host": "redis.internal"
+"redis port": "6379"
+"redis username": ""
+"redis password": "redispass"
+"redis db number": "0"
+
+"Temporal: how should it be provided?": "external endpoint"
+"temporal host": "temporal.internal"
+"temporal port": "7233"

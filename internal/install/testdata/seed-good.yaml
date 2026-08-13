@@ -1,0 +1,32 @@
+license:
+  key: not-a-real-jwt-but-non-empty
+postgresql:
+  host: pg.example.com
+  port: "5432"
+  database: llamacloud
+  username: llama
+  password: pgpass
+redis:
+  host: redis.example.com
+  port: "6379"
+  db: 0
+  password: redispass
+temporal:
+  disabled: false
+  deploy: false
+  host: temporal.example.com
+  port: 7233
+config:
+  llms:
+    # openAi, not openai: the published chart schema sets additionalProperties
+    # false on config.llms and only accepts the camelCase provider keys.
+    openAi:
+      apiKey: sk-openai-xxx
+  authentication:
+    oidc:
+      # discoveryUrl, not issuer: the chart consumes the IdP's well-known
+      # discovery URL and rejects an `issuer` key. Left with enabled unset, so
+      # the OIDC preflight check stays inert for this fixture.
+      discoveryUrl: https://id.example.com/.well-known/openid-configuration
+  storageBuckets:
+    provider: aws

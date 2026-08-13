@@ -1,0 +1,36 @@
+license:
+  key: llama-license-abc123
+global:
+  storageClass: gp3
+config:
+  llms:
+    openAi:
+      apiKey: sk-openai-xxx
+  authentication:
+    oidc:
+      issuer: https://id.example.com
+  parseOcr:
+    gpu: false
+temporal:
+  deploy: true
+  server:
+    config:
+      persistence:
+        defaultStore: default
+        visibilityStore: visibility
+        datastores:
+          default:
+            sql:
+              database: temporal
+postgresql:
+  auth:
+    password: pgpass
+mongodb:
+  auth:
+    rootPassword: mpass
+rabbitmq:
+  auth:
+    password: rpass
+redis:
+  auth:
+    password: redpass

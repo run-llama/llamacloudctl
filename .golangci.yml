@@ -1,0 +1,29 @@
+# golangci-lint configuration (schema v2). Kept intentionally close to the
+# defaults: the default linters (errcheck, govet, ineffassign, staticcheck,
+# unused) catch the mistakes that matter for a small, pure-Go CLI without a wall
+# of style noise. gofmt is enforced separately in CI, so it is not duplicated
+# here. Run locally with `golangci-lint run`.
+version: "2"
+
+run:
+  # The same build tags the Makefile and .goreleaser.yaml use. Without them the
+  # linter analyses a different set of files than the release build compiles.
+  build-tags:
+    - netgo
+    - containers_image_ostree_stub
+    - exclude_graphdriver_devicemapper
+    - exclude_graphdriver_btrfs
+    - containers_image_openpgp
+
+linters:
+  default: standard
+  enable:
+    - misspell     # catch typos in comments/strings — cheap, high signal
+    - unconvert    # flag redundant type conversions
+  exclusions:
+    generated: lax
+    rules:
+      # Test files legitimately ignore errors on cleanup/mutation helpers.
+      - path: _test\.go
+        linters:
+          - errcheck
