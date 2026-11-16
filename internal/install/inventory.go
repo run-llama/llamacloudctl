@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	"helm.sh/helm/v3/pkg/release"
-	"helm.sh/helm/v3/pkg/releaseutil"
+	release "helm.sh/helm/v4/pkg/release/v1"
+	releaseutil "helm.sh/helm/v4/pkg/release/v1/util"
 	"sigs.k8s.io/yaml"
 
 	"github.com/run-llama/llamacloudctl/internal/cloud"

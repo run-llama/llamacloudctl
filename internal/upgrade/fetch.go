@@ -8,11 +8,12 @@ import (
 	"path"
 	"strings"
 
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chart/loader"
-	"helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/getter"
-	"helm.sh/helm/v3/pkg/repo"
+	"helm.sh/helm/v4/pkg/chart/common"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	"helm.sh/helm/v4/pkg/chart/v2/loader"
+	"helm.sh/helm/v4/pkg/cli"
+	"helm.sh/helm/v4/pkg/getter"
+	repo "helm.sh/helm/v4/pkg/repo/v1"
 )
 
 const (
@@ -244,7 +245,7 @@ func findChangelog(ch *chart.Chart) []byte {
 		return strings.EqualFold(path.Base(name), "CHANGELOG.md")
 	}
 	// First pass: the chart-root CHANGELOG.md only.
-	for _, set := range [][]*chart.File{ch.Files, ch.Raw} {
+	for _, set := range [][]*common.File{ch.Files, ch.Raw} {
 		for _, f := range set {
 			if isRootChangelog(f.Name) {
 				return f.Data
@@ -252,7 +253,7 @@ func findChangelog(ch *chart.Chart) []byte {
 		}
 	}
 	// Fallback: any CHANGELOG.md (older layouts may not put it at the root).
-	for _, set := range [][]*chart.File{ch.Files, ch.Raw} {
+	for _, set := range [][]*common.File{ch.Files, ch.Raw} {
 		for _, f := range set {
 			if isAnyChangelog(f.Name) {
 				return f.Data

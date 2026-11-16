@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/run-llama/llamacloudctl/internal/values"
-	"helm.sh/helm/v3/pkg/chart"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
 )
 
 // TestMain makes the package's tests hermetic with respect to the two automatic

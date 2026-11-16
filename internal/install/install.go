@@ -41,8 +41,7 @@ import (
 	"github.com/run-llama/llamacloudctl/internal/tui"
 	"github.com/run-llama/llamacloudctl/internal/values"
 	"golang.org/x/sync/errgroup"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
 )
 
 // Options carries everything the install run needs. The cli command populates it
@@ -1282,14 +1281,14 @@ func runInstall(ctx context.Context, opts Options, chrt *chart.Chart, v *values.
 		return err
 	}
 
-	inst := action.NewInstall(cfg)
+	// Client-side apply + legacy (Helm 3) wait: see kube.NewInstall.
+	inst := kube.NewInstall(cfg, true)
 	inst.ReleaseName = opts.ReleaseName
 	inst.Namespace = opts.Namespace
 	inst.CreateNamespace = true
-	inst.Wait = true
 	inst.WaitForJobs = false
 	inst.Timeout = opts.Timeout
-	inst.Atomic = false // leave failed resources for diagnosis
+	inst.RollbackOnFailure = false // Helm 3's Atomic: leave failed resources for diagnosis
 	if opts.ChartVersion != "" {
 		inst.Version = opts.ChartVersion
 	}
@@ -1303,7 +1302,7 @@ func runInstall(ctx context.Context, opts Options, chrt *chart.Chart, v *values.
 	}
 
 	_, _ = fmt.Fprintf(opts.Out, "\nInstalling %q into %q (waiting up to %s for rollout)...\n", opts.ReleaseName, opts.Namespace, opts.Timeout)
-	rel, err := inst.RunWithContext(ctx, chrt, v.Map())
+	relr, err := inst.RunWithContext(ctx, chrt, v.Map())
 	stop()
 	if err != nil {
 		// On timeout/failure, dump which pods are still not ready and why, so the
@@ -1315,6 +1314,10 @@ func runInstall(ctx context.Context, opts Options, chrt *chart.Chart, v *values.
 			dcancel()
 		}
 		return fmt.Errorf("helm install failed (resources left in place for diagnosis): %w", err)
+	}
+	rel, err := kube.ToV1Release(relr)
+	if err != nil {
+		return err
 	}
 	_, _ = fmt.Fprintf(opts.Out, "\nRelease %q installed: status=%s, revision=%d.\n", rel.Name, rel.Info.Status, rel.Version)
 	// Record the chart release + every Kubernetes object it rendered for the final

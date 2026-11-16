@@ -13,8 +13,8 @@ import (
 	"github.com/run-llama/llamacloudctl/internal/report"
 	"github.com/run-llama/llamacloudctl/internal/tui"
 	"github.com/run-llama/llamacloudctl/internal/values"
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chart/loader"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	"helm.sh/helm/v4/pkg/chart/v2/loader"
 )
 
 // These tests call realRunPreflightPhases DIRECTLY rather than going through

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/run-llama/llamacloudctl/internal/report"
-	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v4/pkg/action"
 )
 
 // renderReleaseName is the release name used for the dry-run render. Helm's
@@ -21,10 +21,11 @@ const renderReleaseName = "llamacloud"
 // after `helm install` starts touching the cluster.
 //
 // IMPORTANT trap: `helm lint` exits 0 even when a {{ fail }} template fires, so
-// this runs the real render path (action.NewInstall with DryRun + ClientOnly),
+// this runs the real render path (action.NewInstall with DryRunStrategy =
+// DryRunClient, Helm 3's DryRun + ClientOnly),
 // not lint.
 //
-// ClientOnly means no cluster contact at all: no capabilities discovery, no
+// A client-side dry run means no cluster contact at all: no capabilities discovery, no
 // release-storage read, so a zero-value action.Configuration is sufficient and
 // the check works with no kubeconfig. The only thing it needs is a chart, so a
 // nil in.Chart — the chart could not be located or downloaded — is the sole skip
@@ -55,8 +56,9 @@ func StaticRenderCheck(ctx context.Context, in Input) []report.Result {
 	// reachable cluster, and a zero-value Configuration is what Helm itself uses
 	// for `helm template`. Replace is not set — it is a no-op under DryRun.
 	inst := action.NewInstall(new(action.Configuration))
-	inst.DryRun = true
-	inst.ClientOnly = true
+	// Helm 4 folds Helm 3's DryRun + ClientOnly pair into DryRunStrategy;
+	// DryRunClient is the `helm template` path (no cluster contact).
+	inst.DryRunStrategy = action.DryRunClient
 	inst.ReleaseName = renderReleaseName
 	inst.Namespace = in.Namespace
 
