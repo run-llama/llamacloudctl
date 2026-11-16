@@ -37,8 +37,8 @@ import (
 	"github.com/run-llama/llamacloudctl/internal/schema"
 	"github.com/run-llama/llamacloudctl/internal/tui"
 	"github.com/run-llama/llamacloudctl/internal/values"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/release"
+	"helm.sh/helm/v4/pkg/action"
+	release "helm.sh/helm/v4/pkg/release/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -225,12 +225,12 @@ func Run(cfg *action.Configuration, f Fetcher, opts Options) error {
 		}
 	}
 
-	up := action.NewUpgrade(cfg)
+	// Client-side apply + legacy (Helm 3) wait: see kube.NewUpgrade.
+	up := kube.NewUpgrade(cfg, true)
 	up.Namespace = opts.Namespace
-	up.Wait = true
 	up.Timeout = opts.Timeout
 	up.MaxHistory = 10
-	// No Atomic: on failure, leave the release in place for diagnosis rather than
+	// No RollbackOnFailure (Helm 3's Atomic): on failure, leave the release in place for diagnosis rather than
 	// auto-rolling-back and erasing the evidence.
 
 	// The wait is no longer silent, and neither is the failure. While helm blocks
@@ -245,7 +245,7 @@ func Run(cfg *action.Configuration, f Fetcher, opts Options) error {
 	}
 	_, _ = fmt.Fprintf(human, "\nUpgrading %q to chart version %s (%s)...\n", rel.Name, art.Version, waitDescription(opts.Timeout))
 
-	upgraded, err := up.Run(rel.Name, art.Chart, migrated)
+	upgradedr, err := up.Run(rel.Name, art.Chart, migrated)
 	stopStream()
 	if err != nil {
 		// The upgrade context is usually already past its deadline by the time we
@@ -256,13 +256,19 @@ func Run(cfg *action.Configuration, f Fetcher, opts Options) error {
 			rollout.Diagnose(dctx, opts.Clientset, opts.Namespace, human)
 			dcancel()
 		}
-		// Truthful about what helm left behind: with Atomic and CleanupOnFail both
+		// Truthful about what helm left behind: with RollbackOnFailure (Helm 3's
+		// Atomic) and CleanupOnFail both
 		// off, a failed upgrade records the NEW revision as failed and leaves the
 		// resources it already applied in the cluster — nothing is deleted and
 		// nothing is rolled back. So the evidence is still there to inspect, and
 		// returning to the previous revision is an explicit operator action.
 		return fmt.Errorf("helm upgrade of %q failed (nothing was rolled back — the new revision is marked failed and its resources are left in place for diagnosis; `%s` returns to the previous revision): %w",
 			rel.Name, rollbackCommand(rel.Name, rel.Version, opts.Namespace), err)
+	}
+
+	upgraded, err := kube.ToV1Release(upgradedr)
+	if err != nil {
+		return err
 	}
 
 	// 10. Persist the migrated values for reuse.

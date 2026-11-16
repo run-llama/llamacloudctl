@@ -10,11 +10,12 @@ import (
 	"testing"
 	"time"
 
-	"helm.sh/helm/v3/pkg/action"
-	kubefake "helm.sh/helm/v3/pkg/kube/fake"
-	"helm.sh/helm/v3/pkg/release"
-	"helm.sh/helm/v3/pkg/storage"
-	"helm.sh/helm/v3/pkg/storage/driver"
+	"helm.sh/helm/v4/pkg/action"
+	kubefake "helm.sh/helm/v4/pkg/kube/fake"
+	rcommon "helm.sh/helm/v4/pkg/release/common"
+	release "helm.sh/helm/v4/pkg/release/v1"
+	"helm.sh/helm/v4/pkg/storage"
+	"helm.sh/helm/v4/pkg/storage/driver"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
@@ -67,7 +68,6 @@ func useMemoryActionConfig(t *testing.T, rels ...*release.Release) *storage.Stor
 		return &action.Configuration{
 			Releases:   store,
 			KubeClient: &kubefake.PrintingKubeClient{Out: io.Discard},
-			Log:        func(string, ...interface{}) {},
 		}, nil
 	}
 	t.Cleanup(func() { newActionConfig = saved })
@@ -79,7 +79,7 @@ func deployedRelease(name string) *release.Release {
 		Name:      name,
 		Namespace: "llamacloud",
 		Version:   1,
-		Status:    release.StatusDeployed,
+		Status:    rcommon.StatusDeployed,
 	})
 }
 
@@ -91,7 +91,7 @@ func pendingInstallRelease(name string) *release.Release {
 		Name:      name,
 		Namespace: "llamacloud",
 		Version:   1,
-		Status:    release.StatusPendingInstall,
+		Status:    rcommon.StatusPendingInstall,
 	})
 }
 
@@ -100,7 +100,7 @@ func failedRelease(name string) *release.Release {
 		Name:      name,
 		Namespace: "llamacloud",
 		Version:   1,
-		Status:    release.StatusFailed,
+		Status:    rcommon.StatusFailed,
 	})
 }
 
@@ -227,7 +227,6 @@ func TestExistingTargetReleasesSurfacesListFailure(t *testing.T) {
 		return &action.Configuration{
 			Releases:   storage.Init(driver.NewMemory()),
 			KubeClient: &unreachableKubeClient{},
-			Log:        func(string, ...interface{}) {},
 		}, nil
 	}
 	t.Cleanup(func() { newActionConfig = saved })
@@ -309,7 +308,6 @@ func TestUninstallReleasesNamesTheFailingRelease(t *testing.T) {
 		return &action.Configuration{
 			Releases:   storage.Init(driver.NewMemory()),
 			KubeClient: &unreachableKubeClient{},
-			Log:        func(string, ...interface{}) {},
 		}, nil
 	}
 	t.Cleanup(func() { newActionConfig = saved })

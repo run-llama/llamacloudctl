@@ -36,11 +36,12 @@ import (
 	"strings"
 
 	"github.com/run-llama/llamacloudctl/internal/install"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chart/loader"
-	"helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/release"
+	"github.com/run-llama/llamacloudctl/internal/kube"
+	"helm.sh/helm/v4/pkg/action"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	"helm.sh/helm/v4/pkg/chart/v2/loader"
+	"helm.sh/helm/v4/pkg/cli"
+	release "helm.sh/helm/v4/pkg/release/v1"
 )
 
 // PinnedChartVersion is the single source of truth for which llamacloud chart
@@ -111,19 +112,25 @@ func EnsureChart() (chrt *chart.Chart, pulled bool, err error) {
 
 // RenderManifest renders the chart to its concatenated manifest YAML exactly as
 // `helm template` would, entirely client-side: no cluster is contacted. It drives
-// Helm's install action in ClientOnly+DryRun mode, which injects a mock kube
+// Helm's install action in client-side dry-run mode (DryRunStrategy =
+// DryRunClient, Helm 3's ClientOnly+DryRun), which injects a mock kube
 // client, in-memory release storage, and the default capability set, so the
 // output depends only on the chart and the values.
 func RenderManifest(chrt *chart.Chart, vals map[string]any) (string, error) {
-	cfg := &action.Configuration{Log: func(string, ...interface{}) {}}
+	// A zero-value Configuration discards Helm 4's slog output, as the no-op
+	// Log func did under Helm 3.
+	cfg := &action.Configuration{}
 	inst := action.NewInstall(cfg)
-	inst.ClientOnly = true
-	inst.DryRun = true
+	inst.DryRunStrategy = action.DryRunClient
 	inst.ReleaseName = RenderReleaseName
 	inst.Namespace = RenderNamespace
 	inst.IncludeCRDs = true
 
-	rel, err := inst.Run(chrt, vals)
+	relr, err := inst.Run(chrt, vals)
+	if err != nil {
+		return "", fmt.Errorf("render chart: %w", err)
+	}
+	rel, err := kube.ToV1Release(relr)
 	if err != nil {
 		return "", fmt.Errorf("render chart: %w", err)
 	}

@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/name: "llamacloud"
   annotations:     
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/llamacloud-s3
+
 ---
 # Source: llamacloud/templates/llamacloud/serviceaccount.yaml
 apiVersion: v1
@@ -24,6 +25,7 @@ metadata:
     app.kubernetes.io/name: "llamacloud-web"
   annotations:     
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/llamacloud-s3
+
 ---
 # Source: llamacloud/templates/llamacloud/serviceaccount.yaml
 apiVersion: v1
@@ -37,6 +39,7 @@ metadata:
     app.kubernetes.io/name: "llamacloud-operator"
   annotations:     
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/llamacloud-s3
+
 ---
 # Source: llamacloud/templates/llamacloud/serviceaccount.yaml
 apiVersion: v1
@@ -50,6 +53,7 @@ metadata:
     app.kubernetes.io/name: "llamacloud-parse"
   annotations:     
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/llamacloud-s3
+
 ---
 # Source: llamacloud/templates/llamacloud/serviceaccount.yaml
 apiVersion: v1
@@ -63,6 +67,7 @@ metadata:
     app.kubernetes.io/name: "llamacloud-layout"
   annotations:     
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/llamacloud-s3
+
 ---
 # Source: llamacloud/templates/llamacloud/serviceaccount.yaml
 apiVersion: v1
@@ -76,6 +81,7 @@ metadata:
     app.kubernetes.io/name: "llamacloud-ocr"
   annotations:     
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/llamacloud-s3
+
 ---
 # Source: llamacloud/templates/llamacloud/serviceaccount.yaml
 apiVersion: v1
@@ -89,6 +95,7 @@ metadata:
     app.kubernetes.io/name: "temporal-jobs-worker"
   annotations:     
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/llamacloud-s3
+
 ---
 # Source: llamacloud/templates/llamacloud/serviceaccount.yaml
 apiVersion: v1
@@ -102,6 +109,7 @@ metadata:
     app.kubernetes.io/name: "llamacloud-temporal-parse"
   annotations:     
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/llamacloud-s3
+
 ---
 # Source: llamacloud/templates/llamacloud/serviceaccount.yaml
 apiVersion: v1
@@ -130,6 +138,7 @@ data:
   BYOC_AUTH_MODE: "YmFzaWM="
   BYOC_VALID_EMAIL_DOMAIN: "ZXhhbXBsZS5jb20="
   BYOC_JWT_SECRET: "Zml4dHVyZS1qd3Qtc2VjcmV0"
+
 ---
 # Source: llamacloud/templates/llamacloud/secrets/buckets-secret.yaml
 apiVersion: v1
@@ -159,6 +168,7 @@ data:
   DATABASE_NAME: "bGxhbWFjbG91ZA=="
   DATABASE_USER: "bGxhbWE="
   DATABASE_PASSWORD: "cGdwYXNz"
+
 ---
 # Source: llamacloud/templates/llamacloud/secrets/data.redis.yaml
 apiVersion: v1
@@ -177,6 +187,7 @@ data:
   REDIS_HOST: "cmVkaXMuaW50ZXJuYWw="
   REDIS_USERNAME: ""
   REDIS_PASSWORD: "cmVkaXNwYXNz"
+
 ---
 # Source: llamacloud/templates/llamacloud/secrets/license.yaml
 apiVersion: v1
@@ -190,6 +201,7 @@ metadata:
   annotations:     
 data:
   LLAMACLOUD_LICENSE_KEY: "bm90LWEtcmVhbC1qd3QtYnV0LW5vbi1lbXB0eQ=="
+
 ---
 # Source: llamacloud/templates/llamacloud/secrets/llm.gemini.yaml
 apiVersion: v1
@@ -218,6 +230,7 @@ metadata:
 data:   
   HOSTNAME: 0.0.0.0
   IS_INDEX_V1_ENABLED: "true"
+
 ---
 # Source: llamacloud/templates/llamacloud/configmap.yaml
 apiVersion: v1
@@ -233,6 +246,8 @@ metadata:
 data:   
   DEBUG_MODE: "false"
   MAX_QUEUE_CONCURRENCY: "3"
+  
+
 ---
 # Source: llamacloud/templates/llamacloud/configmap.yaml
 apiVersion: v1
@@ -260,6 +275,7 @@ data:
   CLEANUP_EXTRACT_V2_BATCH_SIZE: "100"
   CLEANUP_CLASSIFY_V2_RETENTION_DAYS: "14"
   CLEANUP_CLASSIFY_V2_BATCH_SIZE: "100"
+
 ---
 # Source: llamacloud/templates/llamacloud/configmap.yaml
 apiVersion: v1
@@ -275,6 +291,7 @@ metadata:
 data:   
   DEBUG_MODE: "false"
   MAX_QUEUE_CONCURRENCY: "3"
+  
 ---
 # Source: llamacloud/templates/llamacloud/configmaps/buckets.yaml
 apiVersion: v1
@@ -359,6 +376,7 @@ metadata:
 data:
   ## Read by frontend (server-only, non-NEXT_PUBLIC) and backend FeatureFlagSettings
   IS_AGENT_DEPLOYMENTS_ENABLED: "false"
+
 ---
 # Source: llamacloud/templates/llamacloud/configmaps/rate-limits.yaml
 apiVersion: v1
@@ -388,6 +406,7 @@ data:
   DEFAULT_SPREADSHEET_API_QUERY_QPS: "80"
   DEFAULT_SPREADSHEET_API_LIST_QPS: "5"
   DEFAULT_USAGE_API_QUERY_QPS: "20"
+
 ---
 # Source: llamacloud/templates/llamacloud/configmaps/temporal.yaml
 apiVersion: v1
@@ -405,6 +424,7 @@ data:
   TEMPORAL_NAMESPACE: "llamacloud"
   TEMPORAL_WORKER_REGISTRY_PROFILE: "consolidated"
   TEMPORAL_EXTERNAL_PAYLOAD_STORAGE_ENABLED: "false"
+
 ---
 # Source: llamacloud/templates/llamacloud/configmaps/urls.yaml
 apiVersion: v1
@@ -451,6 +471,7 @@ spec:
     app.kubernetes.io/instance: llamacloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: "llamacloud"
+
 ---
 # Source: llamacloud/templates/llamacloud/service.yaml
 apiVersion: v1
@@ -474,6 +495,7 @@ spec:
     app.kubernetes.io/instance: llamacloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: "llamacloud-web"
+
 ---
 # Source: llamacloud/templates/llamacloud/service.yaml
 apiVersion: v1
@@ -497,6 +519,7 @@ spec:
     app.kubernetes.io/instance: llamacloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: "llamacloud-operator"
+
 ---
 # Source: llamacloud/templates/llamacloud/service.yaml
 apiVersion: v1
@@ -520,6 +543,7 @@ spec:
     app.kubernetes.io/instance: llamacloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: "llamacloud-parse"
+
 ---
 # Source: llamacloud/templates/llamacloud/service.yaml
 apiVersion: v1
@@ -543,6 +567,7 @@ spec:
     app.kubernetes.io/instance: llamacloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: "llamacloud-layout"
+
 ---
 # Source: llamacloud/templates/llamacloud/service.yaml
 apiVersion: v1
@@ -566,6 +591,7 @@ spec:
     app.kubernetes.io/instance: llamacloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: "llamacloud-ocr"
+
 ---
 # Source: llamacloud/templates/llamacloud/service.yaml
 apiVersion: v1
@@ -589,6 +615,7 @@ spec:
     app.kubernetes.io/instance: llamacloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: "temporal-jobs-worker"
+
 ---
 # Source: llamacloud/templates/llamacloud/service.yaml
 apiVersion: v1
@@ -612,6 +639,7 @@ spec:
     app.kubernetes.io/instance: llamacloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: "llamacloud-temporal-parse"
+
 ---
 # Source: llamacloud/templates/llamacloud/service.yaml
 apiVersion: v1
@@ -767,6 +795,7 @@ spec:
       - emptyDir: {}
         name: tmp
       terminationGracePeriodSeconds: 30
+
 ---
 # Source: llamacloud/templates/llamacloud/deployment.yaml
 apiVersion: apps/v1
@@ -887,6 +916,7 @@ spec:
       - emptyDir: {}
         name: local-nextjs-cache
       terminationGracePeriodSeconds: 30
+
 ---
 # Source: llamacloud/templates/llamacloud/deployment.yaml
 apiVersion: apps/v1
@@ -1009,6 +1039,7 @@ spec:
       - emptyDir: {}
         name: tmp
       terminationGracePeriodSeconds: 30
+
 ---
 # Source: llamacloud/templates/llamacloud/deployment.yaml
 apiVersion: apps/v1
@@ -1127,6 +1158,7 @@ spec:
       - emptyDir: {}
         name: tmp
       terminationGracePeriodSeconds: 30
+
 ---
 # Source: llamacloud/templates/llamacloud/deployment.yaml
 apiVersion: apps/v1
@@ -1236,6 +1268,7 @@ spec:
       - emptyDir: {}
         name: tmp
       terminationGracePeriodSeconds: 30
+
 ---
 # Source: llamacloud/templates/llamacloud/deployment.yaml
 apiVersion: apps/v1
@@ -1347,6 +1380,7 @@ spec:
       - emptyDir: {}
         name: tmp
       terminationGracePeriodSeconds: 30
+
 ---
 # Source: llamacloud/templates/llamacloud/deployment.yaml
 apiVersion: apps/v1
@@ -1483,6 +1517,7 @@ spec:
       - emptyDir: {}
         name: tmp
       terminationGracePeriodSeconds: 30
+
 ---
 # Source: llamacloud/templates/llamacloud/deployment.yaml
 apiVersion: apps/v1
@@ -1607,6 +1642,7 @@ spec:
       - emptyDir: {}
         name: tmp
       terminationGracePeriodSeconds: 30
+
 ---
 # Source: llamacloud/templates/llamacloud/deployment.yaml
 apiVersion: apps/v1

@@ -11,13 +11,13 @@ import (
 	"time"
 
 	"github.com/run-llama/llamacloudctl/internal/kube"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chartutil"
-	"helm.sh/helm/v3/pkg/cli"
-	kubefake "helm.sh/helm/v3/pkg/kube/fake"
-	"helm.sh/helm/v3/pkg/registry"
-	"helm.sh/helm/v3/pkg/storage"
-	"helm.sh/helm/v3/pkg/storage/driver"
+	"helm.sh/helm/v4/pkg/action"
+	chartcommon "helm.sh/helm/v4/pkg/chart/common"
+	"helm.sh/helm/v4/pkg/cli"
+	kubefake "helm.sh/helm/v4/pkg/kube/fake"
+	"helm.sh/helm/v4/pkg/registry"
+	"helm.sh/helm/v4/pkg/storage"
+	"helm.sh/helm/v4/pkg/storage/driver"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
@@ -72,8 +72,7 @@ func useMemoryActionConfig(t *testing.T) *storage.Storage {
 		return &action.Configuration{
 			Releases:     store,
 			KubeClient:   &kubefake.PrintingKubeClient{Out: io.Discard},
-			Capabilities: chartutil.DefaultCapabilities,
-			Log:          func(string, ...interface{}) {},
+			Capabilities: chartcommon.DefaultCapabilities,
 		}, nil
 	}
 	t.Cleanup(func() { newActionConfig = saved })
@@ -219,8 +218,7 @@ func TestUpgradeOrInstallReleaseSurfacesHistoryFailures(t *testing.T) {
 		return &action.Configuration{
 			Releases:     storage.Init(driver.NewMemory()),
 			KubeClient:   &unreachableHelmKubeClient{},
-			Capabilities: chartutil.DefaultCapabilities,
-			Log:          func(string, ...interface{}) {},
+			Capabilities: chartcommon.DefaultCapabilities,
 		}, nil
 	}
 	t.Cleanup(func() { newActionConfig = saved })

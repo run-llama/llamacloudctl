@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/run-llama/llamacloudctl/internal/kube"
-	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v4/pkg/action"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )

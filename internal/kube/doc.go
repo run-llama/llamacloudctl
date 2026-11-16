@@ -36,5 +36,5 @@
 // into both calls.
 //
 // Nothing in this package shells out to the helm or kubectl binaries; all
-// cluster interaction is via the embedded helm.sh/helm/v3 SDK and client-go.
+// cluster interaction is via the embedded helm.sh/helm/v4 SDK and client-go.
 package kube

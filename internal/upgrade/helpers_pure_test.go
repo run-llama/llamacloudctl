@@ -4,14 +4,15 @@ import (
 	"strings"
 	"testing"
 
-	"helm.sh/helm/v3/pkg/chart"
+	chartcommon "helm.sh/helm/v4/pkg/chart/common"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
 )
 
 // TestFindChangelogPrefersChartRoot proves a subchart's CHANGELOG.md never
 // shadows the chart-root one. The upgrade prints this as the operator's release
 // notes, so a subchart changelog would present entirely wrong upgrade guidance.
 func TestFindChangelogPrefersChartRoot(t *testing.T) {
-	ch := &chart.Chart{Files: []*chart.File{
+	ch := &chart.Chart{Files: []*chartcommon.File{
 		{Name: "charts/llama-agents/CHANGELOG.md", Data: []byte("subchart notes")},
 		{Name: "CHANGELOG.md", Data: []byte("root notes")},
 	}}
@@ -25,7 +26,7 @@ func TestFindChangelogPrefersChartRoot(t *testing.T) {
 // packages the changelog somewhere other than the root still yields notes,
 // rather than silently printing none.
 func TestFindChangelogFallsBackToAnyLocation(t *testing.T) {
-	ch := &chart.Chart{Files: []*chart.File{
+	ch := &chart.Chart{Files: []*chartcommon.File{
 		{Name: "docs/Changelog.md", Data: []byte("relocated notes")},
 	}}
 
@@ -38,7 +39,7 @@ func TestFindChangelogFallsBackToAnyLocation(t *testing.T) {
 // searched too — where a non-template file lands depends on its path, so a
 // Files-only lookup misses some packaged charts.
 func TestFindChangelogReadsRawArchiveFiles(t *testing.T) {
-	ch := &chart.Chart{Raw: []*chart.File{
+	ch := &chart.Chart{Raw: []*chartcommon.File{
 		{Name: "CHANGELOG.md", Data: []byte("raw notes")},
 	}}
 
@@ -50,7 +51,7 @@ func TestFindChangelogReadsRawArchiveFiles(t *testing.T) {
 // TestFindChangelogAbsentIsNil proves a chart that shipped no changelog yields
 // nil, which the advisory renders as "no notes" rather than an empty excerpt.
 func TestFindChangelogAbsentIsNil(t *testing.T) {
-	ch := &chart.Chart{Files: []*chart.File{{Name: "README.md", Data: []byte("readme")}}}
+	ch := &chart.Chart{Files: []*chartcommon.File{{Name: "README.md", Data: []byte("readme")}}}
 
 	if got := findChangelog(ch); got != nil {
 		t.Errorf("findChangelog = %q, want nil when no changelog is packaged", got)

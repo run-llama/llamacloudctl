@@ -11,7 +11,7 @@ import (
 
 	"github.com/run-llama/llamacloudctl/internal/install"
 	"github.com/run-llama/llamacloudctl/internal/report"
-	"helm.sh/helm/v3/pkg/chart"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
 )
 
 // update regenerates the committed golden manifests instead of comparing against
