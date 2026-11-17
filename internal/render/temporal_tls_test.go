@@ -8,7 +8,7 @@ import (
 	"github.com/run-llama/llamacloudctl/internal/install"
 	"github.com/run-llama/llamacloudctl/internal/tui"
 	"github.com/run-llama/llamacloudctl/internal/values"
-	"helm.sh/helm/v3/pkg/chart"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
 )
 
 // TestWizardExternalPostgres_TemporalSubchartGetsSQLTLS is the Tier-2 proof for

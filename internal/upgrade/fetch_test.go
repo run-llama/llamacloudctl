@@ -6,8 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chartutil"
+	chartcommon "helm.sh/helm/v4/pkg/chart/common"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	chartutil "helm.sh/helm/v4/pkg/chart/v2/util"
 )
 
 // testSchema is a minimal but real values.schema.json for fetcher fixtures.
@@ -42,7 +43,7 @@ func writeChartTgz(t *testing.T, version string) string {
 	ch := &chart.Chart{
 		Metadata: &chart.Metadata{APIVersion: "v2", Name: "llamacloud", Version: version},
 		Schema:   []byte(testSchema),
-		Files:    []*chart.File{{Name: "CHANGELOG.md", Data: []byte(testChangelog)}},
+		Files:    []*chartcommon.File{{Name: "CHANGELOG.md", Data: []byte(testChangelog)}},
 	}
 	path, err := chartutil.Save(ch, t.TempDir())
 	if err != nil {

@@ -12,7 +12,7 @@ import (
 	"github.com/run-llama/llamacloudctl/internal/report"
 	"github.com/run-llama/llamacloudctl/internal/tui"
 	"github.com/run-llama/llamacloudctl/internal/values"
-	"helm.sh/helm/v3/pkg/chart"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
 )
 
 // preflightPhase identifies which of the two auto-run phases is executing. The

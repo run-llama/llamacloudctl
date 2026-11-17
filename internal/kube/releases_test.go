@@ -1,16 +1,20 @@
 package kube
 
 import (
+	"context"
 	"errors"
 	"io"
+	"log/slog"
+	"path/filepath"
 	"strings"
 	"testing"
 
-	"helm.sh/helm/v3/pkg/action"
-	kubefake "helm.sh/helm/v3/pkg/kube/fake"
-	"helm.sh/helm/v3/pkg/release"
-	"helm.sh/helm/v3/pkg/storage"
-	"helm.sh/helm/v3/pkg/storage/driver"
+	"helm.sh/helm/v4/pkg/action"
+	kubefake "helm.sh/helm/v4/pkg/kube/fake"
+	rcommon "helm.sh/helm/v4/pkg/release/common"
+	release "helm.sh/helm/v4/pkg/release/v1"
+	"helm.sh/helm/v4/pkg/storage"
+	"helm.sh/helm/v4/pkg/storage/driver"
 )
 
 // unreachableKubeClient is a KubeClient whose reachability probe fails. Every
@@ -39,7 +43,6 @@ func memoryConfig(t *testing.T, rels ...*release.Release) *action.Configuration 
 	return &action.Configuration{
 		Releases:   store,
 		KubeClient: &kubefake.PrintingKubeClient{Out: io.Discard},
-		Log:        func(string, ...interface{}) {},
 	}
 }
 
@@ -49,7 +52,7 @@ func mockRelease(name, namespace string) *release.Release {
 		Name:      name,
 		Namespace: namespace,
 		Version:   1,
-		Status:    release.StatusDeployed,
+		Status:    rcommon.StatusDeployed,
 	})
 }
 
@@ -73,7 +76,7 @@ func TestListReturnsSeededReleases(t *testing.T) {
 
 // mockReleaseStatus builds a release record in a specific status, for the
 // deployed-only-vs-all-states distinction ListAll draws.
-func mockReleaseStatus(name, namespace string, status release.Status) *release.Release {
+func mockReleaseStatus(name, namespace string, status rcommon.Status) *release.Release {
 	return release.Mock(&release.MockReleaseOptions{
 		Name:      name,
 		Namespace: namespace,
@@ -88,7 +91,7 @@ func mockReleaseStatus(name, namespace string, status release.Status) *release.R
 // teardown that cannot see it leaves it behind to deadlock the next install with
 // "cannot re-use a name that is still in use".
 func TestListAllSurfacesPendingInstall(t *testing.T) {
-	cfg := memoryConfig(t, mockReleaseStatus("stuck", "llamacloud", release.StatusPendingInstall))
+	cfg := memoryConfig(t, mockReleaseStatus("stuck", "llamacloud", rcommon.StatusPendingInstall))
 
 	deployedOnly, err := List(cfg)
 	if err != nil {
@@ -187,8 +190,8 @@ func TestStatusReturnsReleaseInfo(t *testing.T) {
 	if rel.Info == nil {
 		t.Fatal("release Info is nil; status rendering reads it")
 	}
-	if rel.Info.Status != release.StatusDeployed {
-		t.Errorf("status = %q, want %q", rel.Info.Status, release.StatusDeployed)
+	if rel.Info.Status != rcommon.StatusDeployed {
+		t.Errorf("status = %q, want %q", rel.Info.Status, rcommon.StatusDeployed)
 	}
 }
 
@@ -205,14 +208,19 @@ func TestStatusMissingReleaseNamesIt(t *testing.T) {
 	}
 }
 
-// TestDebugLogDiscards proves the Helm debug adapter swallows its input rather
-// than writing to stdout — Helm's debug stream is verbose enough to bury the
-// install's own progress output.
-func TestDebugLogDiscards(t *testing.T) {
-	// The contract is "produces nothing and does not panic on any argument
-	// shape", so the assertion is that every call shape returns cleanly.
-	debugLog("plain message")
-	debugLog("formatted %s %d", "value", 42)
-	debugLog("")
-	debugLog("%v", nil)
+// TestNewActionConfigDiscardsHelmLogs proves the Helm SDK's log stream is
+// discarded rather than written to stderr. Helm 4 logs through log/slog and
+// action.NewConfiguration defaults to slog.Default(); the stream is verbose
+// enough to bury the install's own progress output (Helm 3's debug adapter here
+// was a no-op for the same reason).
+func TestNewActionConfigDiscardsHelmLogs(t *testing.T) {
+	cfg, err := NewActionConfig(RESTClientGetter(filepath.Join(t.TempDir(), "absent-kubeconfig"), "ns", ""), "ns")
+	if err != nil {
+		t.Fatalf("NewActionConfig: %v", err)
+	}
+	for _, lvl := range []slog.Level{slog.LevelDebug, slog.LevelInfo, slog.LevelWarn, slog.LevelError} {
+		if cfg.Logger().Handler().Enabled(context.Background(), lvl) {
+			t.Errorf("helm logger enabled at %v; want every level discarded", lvl)
+		}
+	}
 }

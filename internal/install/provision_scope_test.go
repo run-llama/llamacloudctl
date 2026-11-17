@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/run-llama/llamacloudctl/internal/values"
-	"helm.sh/helm/v3/pkg/chart"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
 )
 
 // These tests cover the --provision-in-cluster scoping fix: --provision-in-cluster used to force BOTH data services

@@ -6,12 +6,13 @@ import (
 	"strings"
 	"testing"
 
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
-	kubefake "helm.sh/helm/v3/pkg/kube/fake"
-	"helm.sh/helm/v3/pkg/release"
-	"helm.sh/helm/v3/pkg/storage"
-	"helm.sh/helm/v3/pkg/storage/driver"
+	"helm.sh/helm/v4/pkg/action"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	kubefake "helm.sh/helm/v4/pkg/kube/fake"
+	rcommon "helm.sh/helm/v4/pkg/release/common"
+	release "helm.sh/helm/v4/pkg/release/v1"
+	"helm.sh/helm/v4/pkg/storage"
+	"helm.sh/helm/v4/pkg/storage/driver"
 )
 
 // memoryConfig builds a Helm action configuration backed by in-memory release
@@ -28,7 +29,6 @@ func memoryConfig(t *testing.T, rels ...*release.Release) *action.Configuration 
 	return &action.Configuration{
 		Releases:   store,
 		KubeClient: &kubefake.PrintingKubeClient{Out: io.Discard},
-		Log:        func(string, ...interface{}) {},
 	}
 }
 
@@ -39,7 +39,7 @@ func chartRelease(relName, chartName, version string) *release.Release {
 		Name:      relName,
 		Namespace: "llamacloud",
 		Version:   1,
-		Status:    release.StatusDeployed,
+		Status:    rcommon.StatusDeployed,
 	})
 	rel.Chart = &chart.Chart{Metadata: &chart.Metadata{
 		APIVersion: "v2", Name: chartName, Version: version,
