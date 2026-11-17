@@ -502,6 +502,10 @@ func Run(ctx context.Context, opts Options) error {
 	if err != nil {
 		return fmt.Errorf("resolve chart: %w", err)
 	}
+	if dropped := dropRemovedServicesTheChartLacks(v.Map(), chrt.Schema); len(dropped) > 0 {
+		_, _ = fmt.Fprintf(opts.Out, "Chart %s does not define %s; left those values out.\n",
+			chrt.Metadata.Version, strings.Join(dropped, ", "))
+	}
 	hadSchema, err := ValidateValues(chrt, v.Map())
 	if err != nil {
 		return err // clear schema-violation message
