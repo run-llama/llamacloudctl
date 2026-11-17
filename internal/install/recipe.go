@@ -1,8 +1,10 @@
 package install
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/run-llama/llamacloudctl/internal/values"
@@ -479,6 +481,70 @@ func disableRemovedServices(v valueEditor) {
 		v.Set(svc.key+".enabled", false)
 	}
 	zeroV1ParseWorker(v)
+}
+
+// dropRemovedServicesTheChartLacks deletes values the CLI writes for options
+// that newer charts removed, when the target chart's values.schema.json would
+// reject them, and returns the deleted dotted paths, sorted. A key is rejected
+// when its parent object in the schema does not list it and sets
+// additionalProperties to false.
+//
+// The paths: each removed data service and the v1 parse worker (charts from
+// 0.11.0 ship neither rabbitmq nor llamaParse), and `temporal.disabled` when it
+// is false (charts from 0.10.0 dropped the flag; false was its default, so
+// dropping it changes nothing). A true `temporal.disabled` stays, so validation
+// still refuses an install that asked for Temporal off. With no schema, or one
+// that accepts the key, nothing is deleted.
+func dropRemovedServicesTheChartLacks(vals map[string]any, schemaJSON []byte) []string {
+	if len(schemaJSON) == 0 {
+		return nil
+	}
+	var root schemaNode
+	if err := json.Unmarshal(schemaJSON, &root); err != nil {
+		return nil
+	}
+	paths := []string{v1ParseWorkerKey}
+	for _, svc := range removedDataServices {
+		paths = append(paths, svc.key)
+	}
+	if b, ok := values.FromMap(vals).Get("temporal.disabled"); ok && b == false {
+		paths = append(paths, "temporal.disabled")
+	}
+	var dropped []string
+	for _, path := range paths {
+		if deleteIfRejected(vals, &root, strings.Split(path, ".")) {
+			dropped = append(dropped, path)
+		}
+	}
+	sort.Strings(dropped)
+	return dropped
+}
+
+// schemaNode is the slice of a JSON schema object that
+// dropRemovedServicesTheChartLacks reads.
+type schemaNode struct {
+	AdditionalProperties *bool                 `json:"additionalProperties"`
+	Properties           map[string]schemaNode `json:"properties"`
+}
+
+// deleteIfRejected walks segs through vals and node together and deletes the
+// last segment when node's object at that level lists it nowhere and forbids
+// additional properties. It reports whether it deleted anything.
+func deleteIfRejected(vals map[string]any, node *schemaNode, segs []string) bool {
+	key := segs[0]
+	child, defined := node.Properties[key]
+	if len(segs) == 1 {
+		if _, set := vals[key]; !set || defined || node.AdditionalProperties == nil || *node.AdditionalProperties {
+			return false
+		}
+		delete(vals, key)
+		return true
+	}
+	next, ok := vals[key].(map[string]any)
+	if !ok || !defined {
+		return false
+	}
+	return deleteIfRejected(next, &child, segs[1:])
 }
 
 // valueSetter is the subset of *values.Values the pure wiring helpers need. It
