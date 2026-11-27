@@ -20,10 +20,9 @@ import (
 // and /api/health to 200.
 
 // TestDisableRemovedServices_ZeroesV1ParseWorker pins the fix at its single
-// source of truth — the helper every values-assembly path runs through — and
-// proves the result is accepted by the REAL published chart schema (which is what
-// makes `llamaParse.replicas` the right key: the schema exposes no
-// llamaParse.enabled flag).
+// source of truth — the helper every values-assembly path runs through — for
+// charts that still ship the v1 worker (through 0.10.x). The schema there exposes
+// no llamaParse.enabled flag, which is what makes `llamaParse.replicas` the key.
 func TestDisableRemovedServices_ZeroesV1ParseWorker(t *testing.T) {
 	v := mkValues(t, nil)
 	disableRemovedServices(v)
@@ -40,7 +39,80 @@ func TestDisableRemovedServices_ZeroesV1ParseWorker(t *testing.T) {
 	if b, _ := v.Get("rabbitmq.enabled"); b != false {
 		t.Errorf("rabbitmq.enabled = %v, want false", b)
 	}
+	// A pre-0.11 schema defines both keys, so the install path keeps them.
+	if dropped := dropRemovedServicesTheChartLacks(v.Map(), schemaDefining("rabbitmq", "llamaParse", "mongodb", "qdrant")); len(dropped) != 0 {
+		t.Errorf("dropped %v from a chart that defines them", dropped)
+	}
+}
+
+// TestDropRemovedServices_PublishedChartAcceptsTheValues runs the install path's
+// order against the REAL latest published chart: assemble, drop the keys the
+// chart does not define, validate. From 0.11.0 the chart has neither rabbitmq nor
+// llamaParse and rejects unknown top-level keys, so without the drop every
+// install fails schema validation.
+func TestDropRemovedServices_PublishedChartAcceptsTheValues(t *testing.T) {
+	v := mkValues(t, nil)
+	disableRemovedServices(v)
+	dropRemovedServicesTheChartLacks(v.Map(), publishedSchema(t))
 	assertSchemaValid(t, v)
+}
+
+// TestDropRemovedServices_KeepsKeysTheChartDefines covers the boundary: only the
+// keys missing from the schema go, and an operator value for a key the chart
+// still defines is untouched.
+func TestDropRemovedServices_KeepsKeysTheChartDefines(t *testing.T) {
+	v := mkValues(t, map[string]any{"mongodb.enabled": true})
+	disableRemovedServices(v)
+	got := dropRemovedServicesTheChartLacks(v.Map(), schemaDefining("mongodb", "qdrant"))
+	if want := []string{"llamaParse", "rabbitmq"}; strings.Join(got, ",") != strings.Join(want, ",") {
+		t.Errorf("dropped %v, want %v", got, want)
+	}
+	if _, ok := v.Get("mongodb.enabled"); !ok {
+		t.Error("mongodb.enabled was dropped although the chart defines mongodb")
+	}
+	if dropped := dropRemovedServicesTheChartLacks(v.Map(), nil); dropped != nil {
+		t.Errorf("no schema dropped %v, want nothing", dropped)
+	}
+	// A schema that accepts unknown keys rejects nothing, so nothing goes.
+	open := []byte(`{"type": "object", "properties": {"mongodb": {"type": "object"}}}`)
+	v2 := mkValues(t, nil)
+	disableRemovedServices(v2)
+	if dropped := dropRemovedServicesTheChartLacks(v2.Map(), open); dropped != nil {
+		t.Errorf("a schema without additionalProperties: false dropped %v", dropped)
+	}
+}
+
+// TestDropRemovedServices_TemporalDisabledFlag covers the nested key: charts
+// from 0.10.0 have no temporal.disabled. A false flag (the external-endpoint
+// wizard path) goes; a true one stays so validation refuses the install rather
+// than silently re-enabling Temporal.
+func TestDropRemovedServices_TemporalDisabledFlag(t *testing.T) {
+	schema := []byte(`{"type": "object", "properties": {"temporal": {"type": "object",
+		"additionalProperties": false, "properties": {"deploy": {}, "host": {}, "port": {}}}}}`)
+	for _, tc := range []struct {
+		set      bool
+		wantDrop bool
+	}{{false, true}, {true, false}} {
+		v := mkValues(t, map[string]any{"temporal.disabled": tc.set, "temporal.host": "t.example.com"})
+		dropped := dropRemovedServicesTheChartLacks(v.Map(), schema)
+		_, kept := v.Get("temporal.disabled")
+		if kept == tc.wantDrop {
+			t.Errorf("temporal.disabled=%v: kept=%v, want dropped=%v (dropped %v)", tc.set, kept, tc.wantDrop, dropped)
+		}
+		if _, ok := v.Get("temporal.host"); !ok {
+			t.Errorf("temporal.disabled=%v: temporal.host was dropped", tc.set)
+		}
+	}
+}
+
+// schemaDefining returns a minimal values.schema.json whose top-level
+// properties are exactly keys.
+func schemaDefining(keys ...string) []byte {
+	props := make([]string, len(keys))
+	for i, k := range keys {
+		props[i] = `"` + k + `": {"type": "object"}`
+	}
+	return []byte(`{"type": "object", "additionalProperties": false, "properties": {` + strings.Join(props, ", ") + `}}`)
 }
 
 // TestDisableRemovedServices_KeepsOperatorReplicas is the explicit-intent half:
