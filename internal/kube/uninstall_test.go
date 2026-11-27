@@ -5,10 +5,10 @@ import (
 	"io"
 	"testing"
 
-	"helm.sh/helm/v3/pkg/action"
-	kubefake "helm.sh/helm/v3/pkg/kube/fake"
-	"helm.sh/helm/v3/pkg/storage"
-	"helm.sh/helm/v3/pkg/storage/driver"
+	"helm.sh/helm/v4/pkg/action"
+	kubefake "helm.sh/helm/v4/pkg/kube/fake"
+	"helm.sh/helm/v4/pkg/storage"
+	"helm.sh/helm/v4/pkg/storage/driver"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
@@ -21,7 +21,6 @@ func TestUninstallMissingReleaseIsNoOp(t *testing.T) {
 	cfg := &action.Configuration{
 		Releases:   storage.Init(driver.NewMemory()),
 		KubeClient: &kubefake.PrintingKubeClient{Out: io.Discard},
-		Log:        func(string, ...interface{}) {},
 	}
 	resp, err := Uninstall(cfg, "does-not-exist", 0)
 	if err != nil {

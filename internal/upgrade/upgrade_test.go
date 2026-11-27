@@ -10,16 +10,18 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/run-llama/llamacloudctl/internal/kube"
 	"github.com/run-llama/llamacloudctl/internal/report"
 	"github.com/run-llama/llamacloudctl/internal/tui"
 	"gopkg.in/yaml.v3"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chartutil"
-	kubefake "helm.sh/helm/v3/pkg/kube/fake"
-	"helm.sh/helm/v3/pkg/release"
-	"helm.sh/helm/v3/pkg/storage"
-	"helm.sh/helm/v3/pkg/storage/driver"
+	"helm.sh/helm/v4/pkg/action"
+	chartcommon "helm.sh/helm/v4/pkg/chart/common"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	kubefake "helm.sh/helm/v4/pkg/kube/fake"
+	rcommon "helm.sh/helm/v4/pkg/release/common"
+	release "helm.sh/helm/v4/pkg/release/v1"
+	"helm.sh/helm/v4/pkg/storage"
+	"helm.sh/helm/v4/pkg/storage/driver"
 )
 
 // Schemas used across the orchestration tests. The OLD schema is always
@@ -54,8 +56,7 @@ func testActionConfig(t *testing.T, rel *release.Release) *action.Configuration 
 	return &action.Configuration{
 		Releases:     store,
 		KubeClient:   &kubefake.PrintingKubeClient{Out: io.Discard},
-		Capabilities: chartutil.DefaultCapabilities,
-		Log:          func(string, ...interface{}) {},
+		Capabilities: chartcommon.DefaultCapabilities,
 	}
 }
 
@@ -66,7 +67,7 @@ func seededRelease(oldSchema string, config map[string]any) *release.Release {
 		Name:      "llamacloud",
 		Namespace: "default",
 		Version:   1,
-		Info:      &release.Info{Status: release.StatusDeployed},
+		Info:      &release.Info{Status: rcommon.StatusDeployed},
 		Chart: &chart.Chart{
 			Metadata: &chart.Metadata{APIVersion: "v2", Name: "llamacloud", Version: "0.8.0"},
 			Schema:   []byte(oldSchema),
@@ -131,7 +132,11 @@ type jsonReport struct {
 // revisionOf returns the current revision of the seeded release.
 func revisionOf(t *testing.T, cfg *action.Configuration) int {
 	t.Helper()
-	rel, err := cfg.Releases.Last("llamacloud")
+	relr, err := cfg.Releases.Last("llamacloud")
+	if err != nil {
+		t.Fatalf("read release: %v", err)
+	}
+	rel, err := kube.ToV1Release(relr)
 	if err != nil {
 		t.Fatalf("read release: %v", err)
 	}

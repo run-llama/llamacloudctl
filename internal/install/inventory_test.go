@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/run-llama/llamacloudctl/internal/provision"
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/release"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	rcommon "helm.sh/helm/v4/pkg/release/common"
+	release "helm.sh/helm/v4/pkg/release/v1"
 )
 
 // sampleManifest is a rendered Helm manifest with the mix the snapshot must handle:
@@ -103,7 +104,7 @@ func TestInventory_WriteText_GroupsAndCollapses(t *testing.T) {
 		Name:      "llamacloud",
 		Namespace: "prod",
 		Version:   1,
-		Info:      &release.Info{Status: release.StatusDeployed},
+		Info:      &release.Info{Status: rcommon.StatusDeployed},
 		Chart:     &chart.Chart{Metadata: &chart.Metadata{Name: "llamacloud", Version: "1.2.3"}},
 		Manifest:  sampleManifest,
 	}, "prod", false)

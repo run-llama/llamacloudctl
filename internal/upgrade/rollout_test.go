@@ -11,12 +11,12 @@ import (
 	"time"
 
 	"github.com/run-llama/llamacloudctl/internal/rollout"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chartutil"
-	kubefake "helm.sh/helm/v3/pkg/kube/fake"
-	"helm.sh/helm/v3/pkg/release"
-	"helm.sh/helm/v3/pkg/storage"
-	"helm.sh/helm/v3/pkg/storage/driver"
+	"helm.sh/helm/v4/pkg/action"
+	chartcommon "helm.sh/helm/v4/pkg/chart/common"
+	kubefake "helm.sh/helm/v4/pkg/kube/fake"
+	release "helm.sh/helm/v4/pkg/release/v1"
+	"helm.sh/helm/v4/pkg/storage"
+	"helm.sh/helm/v4/pkg/storage/driver"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -78,8 +78,7 @@ func waitingActionConfig(t *testing.T, rel *release.Release, wait time.Duration,
 			WaitDuration:       wait,
 			WaitError:          waitErr,
 		},
-		Capabilities: chartutil.DefaultCapabilities,
-		Log:          func(string, ...interface{}) {},
+		Capabilities: chartcommon.DefaultCapabilities,
 	}
 }
 

@@ -10,13 +10,13 @@ import (
 
 	"github.com/run-llama/llamacloudctl/internal/kube"
 	"github.com/run-llama/llamacloudctl/internal/tui"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chart/loader"
-	"helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/registry"
-	"helm.sh/helm/v3/pkg/release"
-	"helm.sh/helm/v3/pkg/storage/driver"
+	"helm.sh/helm/v4/pkg/action"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	"helm.sh/helm/v4/pkg/chart/v2/loader"
+	"helm.sh/helm/v4/pkg/cli"
+	"helm.sh/helm/v4/pkg/registry"
+	release "helm.sh/helm/v4/pkg/release/v1"
+	"helm.sh/helm/v4/pkg/storage/driver"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/client-go/kubernetes"
 )
@@ -235,9 +235,9 @@ func upgradeOrInstallRelease(ctx context.Context, getter genericclioptions.RESTC
 	}
 
 	if exists {
-		upg := action.NewUpgrade(cfg)
+		// Client-side apply + legacy (Helm 3) wait: see kube.NewUpgrade.
+		upg := kube.NewUpgrade(cfg, true)
 		upg.Namespace = namespace
-		upg.Wait = true
 		upg.WaitForJobs = false
 		upg.Timeout = timeout
 		upg.Version = r.Version
@@ -250,17 +250,17 @@ func upgradeOrInstallRelease(ctx context.Context, getter genericclioptions.RESTC
 		if err != nil {
 			return nil, fmt.Errorf("upgrade release: %w", err)
 		}
-		return rel, nil
+		return kube.ToV1Release(rel)
 	}
 
-	inst := action.NewInstall(cfg)
+	// Client-side apply + legacy (Helm 3) wait: see kube.NewInstall.
+	inst := kube.NewInstall(cfg, true)
 	inst.ReleaseName = r.Release
 	inst.Namespace = namespace
 	inst.CreateNamespace = true
-	inst.Wait = true
 	inst.WaitForJobs = false
 	inst.Timeout = timeout
-	inst.Atomic = false
+	inst.RollbackOnFailure = false // Helm 3's Atomic
 	inst.Version = r.Version
 	inst.SetRegistryClient(regClient)
 	chrt, err := loadReleaseChart(&inst.ChartPathOptions, settings, r.Chart)
@@ -271,7 +271,7 @@ func upgradeOrInstallRelease(ctx context.Context, getter genericclioptions.RESTC
 	if err != nil {
 		return nil, fmt.Errorf("install release: %w", err)
 	}
-	return rel, nil
+	return kube.ToV1Release(rel)
 }
 
 // loadReleaseChart resolves (pulling if needed) and loads the chart named by ref

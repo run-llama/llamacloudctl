@@ -4,13 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 	"time"
 
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/registry"
-	"helm.sh/helm/v3/pkg/release"
-	"helm.sh/helm/v3/pkg/storage/driver"
+	"helm.sh/helm/v4/pkg/action"
+	helmkube "helm.sh/helm/v4/pkg/kube"
+	"helm.sh/helm/v4/pkg/registry"
+	releasei "helm.sh/helm/v4/pkg/release"
+	release "helm.sh/helm/v4/pkg/release/v1"
+	"helm.sh/helm/v4/pkg/storage/driver"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -103,18 +106,21 @@ func ResolveEKSClusterARN(kubeconfig, context string) string {
 
 // NewActionConfig builds a Helm action.Configuration bound to the given getter
 // and namespace. It uses the "secret" storage driver (release state stored as
-// Kubernetes Secrets), a debug-log adapter, and an OCI registry.Client set on
+// Kubernetes Secrets), a discarding logger, and an OCI registry.Client set on
 // the configuration so that OCI-hosted charts (oci://...) resolve.
 //
 // The returned *action.Configuration is ready to drive action.NewInstall,
 // action.NewUpgrade, etc. No helm binary is invoked.
 func NewActionConfig(getter genericclioptions.RESTClientGetter, namespace string) (*action.Configuration, error) {
-	cfg := new(action.Configuration)
+	// Helm 4 logs through log/slog and action.NewConfiguration defaults to
+	// slog.Default() (stderr). Helm 3's debug stream was discarded here, so keep
+	// it discarded: the CLI's own output is the only thing an operator sees.
+	cfg := action.NewConfiguration(action.ConfigurationSetLogger(slog.DiscardHandler))
 	// helmDriver "secret" selects the Kubernetes Secret storage driver (release
 	// state persisted as Secrets). action.Configuration.Init lower-cases nothing
 	// and only accepts "secret"/"secrets"/"" — the driver.SecretsDriverName
 	// constant ("Secret") is NOT a valid Init argument, so the literal is used.
-	if err := cfg.Init(getter, namespace, secretStorageDriver, debugLog); err != nil {
+	if err := cfg.Init(getter, namespace, secretStorageDriver); err != nil {
 		return nil, fmt.Errorf("initialize helm action configuration: %w", err)
 	}
 
@@ -159,15 +165,20 @@ func NewRESTConfig(getter genericclioptions.RESTClientGetter) (*rest.Config, err
 // not an error. This is a read-only helper the install/upgrade command surfaces
 // build on; it never invokes the helm binary.
 func List(cfg *action.Configuration) ([]*release.Release, error) {
-	releases, err := action.NewList(cfg).Run()
+	l := action.NewList(cfg)
+	// Helm 3's NewList defaulted the mask to deployed|failed; Helm 4's defaults
+	// to ListAll. Pin the Helm 3 mask so List keeps hiding pending/uninstalling
+	// releases from its deployed-only callers (upgrade auto-detect).
+	l.StateMask = action.ListDeployed | action.ListFailed
+	releases, err := l.Run()
 	if err != nil {
 		return nil, fmt.Errorf("list helm releases: %w", err)
 	}
-	return releases, nil
+	return ToV1Releases(releases)
 }
 
-// ListAll is List across EVERY release state, not just deployed. action.NewList
-// defaults its StateMask to deployed-only, so a release stuck in pending-install or
+// ListAll is List across EVERY release state, not just deployed. List pins
+// its StateMask to deployed|failed (Helm 3's NewList default), so a release stuck in pending-install or
 // failed — exactly what a chart install that timed out or errored leaves behind — is
 // invisible to the default List. Uninstall discovery MUST see those: a
 // pending-install release the teardown cannot see survives the uninstall and then
@@ -180,16 +191,16 @@ func List(cfg *action.Configuration) ([]*release.Release, error) {
 func ListAll(cfg *action.Configuration) ([]*release.Release, error) {
 	l := action.NewList(cfg)
 	// Setting All alone is NOT enough: List.Run never calls SetStateMask, so the
-	// mask stays at its default (ListDeployed|ListFailed) and pending-install is
-	// still filtered out — the exact state the deadlock lives in. SetStateMask is
-	// what turns All into the full ListAll bitmask.
+	// mask would stay whatever NewList defaulted it to (deployed|failed under
+	// Helm 3; ListAll under Helm 4). SetStateMask is what turns All into the full
+	// ListAll bitmask whatever the SDK default is.
 	l.All = true
 	l.SetStateMask()
 	releases, err := l.Run()
 	if err != nil {
 		return nil, fmt.Errorf("list helm releases (all states): %w", err)
 	}
-	return releases, nil
+	return ToV1Releases(releases)
 }
 
 // Get returns the named Helm release (the equivalent of `helm get`), including
@@ -199,7 +210,7 @@ func Get(cfg *action.Configuration, name string) (*release.Release, error) {
 	if err != nil {
 		return nil, fmt.Errorf("get helm release %q: %w", name, err)
 	}
-	return rel, nil
+	return ToV1Release(rel)
 }
 
 // Status returns the named Helm release with its latest status/info (the
@@ -210,7 +221,7 @@ func Status(cfg *action.Configuration, name string) (*release.Release, error) {
 	if err != nil {
 		return nil, fmt.Errorf("get status of helm release %q: %w", name, err)
 	}
-	return rel, nil
+	return ToV1Release(rel)
 }
 
 // Uninstall removes the named Helm release and all of its Kubernetes resources
@@ -220,9 +231,13 @@ func Status(cfg *action.Configuration, name string) (*release.Release, error) {
 // an uninstall of a partially-removed install — converges instead of failing.
 // timeout bounds the wait for the resources to be deleted; a zero timeout uses
 // Helm's default. No helm binary is invoked.
-func Uninstall(cfg *action.Configuration, name string, timeout time.Duration) (*release.UninstallReleaseResponse, error) {
+func Uninstall(cfg *action.Configuration, name string, timeout time.Duration) (*releasei.UninstallReleaseResponse, error) {
 	un := action.NewUninstall(cfg)
-	un.Wait = true
+	// Helm 3's Wait=true polled until every resource was gone. Helm 4 has no
+	// default wait strategy for uninstall (an unset one is an error) and its
+	// CLI default is the kstatus watcher; LegacyStrategy keeps the Helm 3
+	// polling behaviour (and needs no watch RBAC).
+	un.WaitStrategy = WaitStrategy(true)
 	if timeout > 0 {
 		un.Timeout = timeout
 	}
@@ -252,10 +267,87 @@ func DeleteNamespace(ctx context.Context, clientset kubernetes.Interface, namesp
 	return nil
 }
 
-// debugLog is the Helm action debug-log adapter. Helm's debug stream is very
-// verbose, so the bootstrap discards it by default; callers that want Helm
-// diagnostics can build their own action.Configuration with a different logger.
-func debugLog(format string, v ...interface{}) {
-	_ = format
-	_ = v
+// WaitStrategy maps the Helm 3 boolean Wait flag onto the Helm 4 wait strategy
+// that reproduces it, so every action this CLI drives keeps its Helm 3
+// behaviour instead of picking up Helm 4's new defaults:
+//
+//   - wait=true  -> LegacyStrategy: Helm 3's periodic readiness polling. Helm 4's
+//     CLI default for --wait is the kstatus watcher, which judges readiness
+//     differently and needs list+watch RBAC on every resource kind.
+//   - wait=false -> HookOnlyStrategy: do not wait on the release's resources,
+//     only on hooks (Helm 3 always waited on hooks). Helm 4 rejects an unset
+//     strategy, so "no wait" must be spelled out.
+func WaitStrategy(wait bool) helmkube.WaitStrategy {
+	if wait {
+		return helmkube.LegacyStrategy
+	}
+	return helmkube.HookOnlyStrategy
+}
+
+// NewInstall returns an action.Install pinned to Helm 3 behaviour where Helm 4
+// changed the default:
+//
+//   - client-side apply: Helm 4's Install defaults ServerSideApply to true.
+//     Releases this CLI installed under Helm 3 were applied client-side, and
+//     mixing field managers on the same objects causes conflicts on later
+//     upgrades, so stay client-side.
+//   - wait: see WaitStrategy (legacy polling when wait is true).
+func NewInstall(cfg *action.Configuration, wait bool) *action.Install {
+	inst := action.NewInstall(cfg)
+	inst.ServerSideApply = false
+	inst.WaitStrategy = WaitStrategy(wait)
+	return inst
+}
+
+// upgradeClientSideApply is the action.Upgrade.ServerSideApply value that
+// forces client-side apply. The field is a string ("true", "false", "auto").
+const upgradeClientSideApply = "false"
+
+// NewUpgrade returns an action.Upgrade pinned to Helm 3 behaviour where Helm 4
+// changed the default:
+//
+//   - client-side apply: Helm 4's Upgrade defaults ServerSideApply to "auto"
+//     (follow the previous revision's apply method). Pin "false" so an upgrade
+//     always applies the way Helm 3 did, whatever recorded the last revision.
+//   - wait: see WaitStrategy (legacy polling when wait is true).
+func NewUpgrade(cfg *action.Configuration, wait bool) *action.Upgrade {
+	up := action.NewUpgrade(cfg)
+	up.ServerSideApply = upgradeClientSideApply
+	up.WaitStrategy = WaitStrategy(wait)
+	return up
+}
+
+// ToV1Release narrows the Helm 4 release.Releaser interface (an `any`) that the
+// action package now returns to the concrete chart-v2 *release.Release this CLI
+// reads. The llamacloud chart is apiVersion v2, so a v1 release record is the
+// only shape Helm produces for it; anything else is reported, not ignored.
+func ToV1Release(rel releasei.Releaser) (*release.Release, error) {
+	switch r := rel.(type) {
+	case *release.Release:
+		return r, nil
+	case release.Release:
+		return &r, nil
+	case nil:
+		return nil, nil
+	default:
+		return nil, fmt.Errorf("unsupported helm release type %T", rel)
+	}
+}
+
+// ToV1Releases is ToV1Release over a slice.
+func ToV1Releases(rels []releasei.Releaser) ([]*release.Release, error) {
+	if rels == nil {
+		return nil, nil
+	}
+	out := make([]*release.Release, 0, len(rels))
+	for _, r := range rels {
+		v1, err := ToV1Release(r)
+		if err != nil {
+			return nil, err
+		}
+		if v1 != nil {
+			out = append(out, v1)
+		}
+	}
+	return out, nil
 }

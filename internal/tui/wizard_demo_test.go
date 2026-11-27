@@ -1,8 +1,9 @@
 package tui
 
 import (
-	huh "charm.land/huh/v2"
 	"testing"
+
+	huh "charm.land/huh/v2"
 )
 
 // TestWizardRunnerHeadless demonstrates the grouped multi-step wizard-runner end

@@ -29,8 +29,8 @@ import (
 	"fmt"
 
 	"github.com/run-llama/llamacloudctl/internal/report"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v4/pkg/action"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )

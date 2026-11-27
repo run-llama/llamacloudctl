@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	kubefake "helm.sh/helm/v3/pkg/kube/fake"
+	kubefake "helm.sh/helm/v4/pkg/kube/fake"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
@@ -26,8 +26,12 @@ func TestUninstallRemovesRelease(t *testing.T) {
 	if resp == nil || resp.Release == nil {
 		t.Fatal("Uninstall returned no release in its response")
 	}
-	if resp.Release.Name != "llamacloud" {
-		t.Errorf("uninstalled release = %q, want llamacloud", resp.Release.Name)
+	rel, err := ToV1Release(resp.Release)
+	if err != nil {
+		t.Fatalf("uninstall response release: %v", err)
+	}
+	if rel.Name != "llamacloud" {
+		t.Errorf("uninstalled release = %q, want llamacloud", rel.Name)
 	}
 	// A second uninstall converges instead of failing.
 	if _, err := Uninstall(cfg, "llamacloud", 0); err != nil {

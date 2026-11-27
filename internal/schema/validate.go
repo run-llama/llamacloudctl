@@ -3,7 +3,7 @@ package schema
 import (
 	"fmt"
 
-	"helm.sh/helm/v3/pkg/chartutil"
+	chartutil "helm.sh/helm/v4/pkg/chart/common/util"
 )
 
 // Validate checks the migrated values against the target chart's

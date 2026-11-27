@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/run-llama/llamacloudctl/internal/report"
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chart/loader"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	"helm.sh/helm/v4/pkg/chart/v2/loader"
 )
 
 // managedRenderChart loads the fixture that mirrors the real chart's data-service
