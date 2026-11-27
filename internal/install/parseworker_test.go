@@ -347,3 +347,20 @@ func TestInstallValuesPhase_WarnsOnKeptParseWorker(t *testing.T) {
 		}
 	}
 }
+
+// TestDropRemovedServices_ObjectValuedAdditionalProperties covers a schema whose
+// additionalProperties is a schema object somewhere below the root, as in chart
+// 0.13.0. It used to fail the whole parse, so nothing was dropped and every
+// install failed validation on rabbitmq and llamaParse.
+func TestDropRemovedServices_ObjectValuedAdditionalProperties(t *testing.T) {
+	v := mkValues(t, nil)
+	disableRemovedServices(v)
+	sch := []byte(`{"type": "object", "additionalProperties": false, "properties": {
+		"config": {"type": "object", "properties": {
+			"overrides": {"type": "object", "additionalProperties": {"type": "number"}}}},
+		"mongodb": {"type": "object"}, "qdrant": {"type": "object"}}}`)
+	got := dropRemovedServicesTheChartLacks(v.Map(), sch)
+	if want := []string{"llamaParse", "rabbitmq"}; strings.Join(got, ",") != strings.Join(want, ",") {
+		t.Errorf("dropped %v, want %v", got, want)
+	}
+}

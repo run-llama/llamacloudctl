@@ -523,8 +523,20 @@ func dropRemovedServicesTheChartLacks(vals map[string]any, schemaJSON []byte) []
 // schemaNode is the slice of a JSON schema object that
 // dropRemovedServicesTheChartLacks reads.
 type schemaNode struct {
-	AdditionalProperties *bool                 `json:"additionalProperties"`
+	AdditionalProperties additionalProperties  `json:"additionalProperties"`
 	Properties           map[string]schemaNode `json:"properties"`
+}
+
+// additionalProperties holds a schema's additionalProperties keyword, which is
+// either a boolean or a schema object (e.g. a map of typed overrides). Only the
+// literal false forbids unknown keys; true, an object or absence allows them.
+// Typing it as *bool made json.Unmarshal fail on the first object-valued one
+// (chart 0.13.0 has several), and a failed parse dropped nothing.
+type additionalProperties struct{ forbidden bool }
+
+func (a *additionalProperties) UnmarshalJSON(b []byte) error {
+	a.forbidden = strings.TrimSpace(string(b)) == "false"
+	return nil
 }
 
 // deleteIfRejected walks segs through vals and node together and deletes the
@@ -534,7 +546,7 @@ func deleteIfRejected(vals map[string]any, node *schemaNode, segs []string) bool
 	key := segs[0]
 	child, defined := node.Properties[key]
 	if len(segs) == 1 {
-		if _, set := vals[key]; !set || defined || node.AdditionalProperties == nil || *node.AdditionalProperties {
+		if _, set := vals[key]; !set || defined || !node.AdditionalProperties.forbidden {
 			return false
 		}
 		delete(vals, key)
